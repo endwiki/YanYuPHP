@@ -24,4 +24,12 @@ class Request{
     public static function put(){
 
     }
+
+    public static function getMethod(){
+        return $_SERVER['REQUEST_METHOD'] ?? NULL;
+    }
+
+    public static function getUrl(){
+        return $_SERVER['REQUEST_URI'] ?? NULL;
+    }
 }

@@ -38,4 +38,6 @@ class Route{
     public static function getArgs(){
         return self::$args;
     }
+
+
 }
