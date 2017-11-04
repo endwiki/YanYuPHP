@@ -18,10 +18,10 @@ class Config {
 
     // 获取配置
     public static function get($key = null){
+        // 如果为空，则返回全部配置
         if(is_null($key)){
             return self::$config;
-        }
-        if(in_array(strtoupper($key),array_keys(self::$config))){
+        }else{
             return (self::$config)[$key];
         }
         return null;

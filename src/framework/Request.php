@@ -13,16 +13,23 @@ class Request{
 
     }
 
-    public static function post(){
-
+    public static function post($key = null){
+        if($key === null){
+            return $_POST;
+        }
+        return $_POST[$key];
     }
 
     public static function delete(){
 
     }
 
-    public static function put(){
-
+    public static function put($key = null){
+        $putData = fopen("php://input","r");
+        while($data = fread($putData,1024)){
+            $returnData[] = $data;
+        }
+        return $returnData;
     }
 
     public static function getMethod(){

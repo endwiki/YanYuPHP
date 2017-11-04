@@ -14,8 +14,8 @@ use app\common\exceptions\HttpRequestMethodException;
 class Restful {
 
     private $actionMethodMap = [
-        'add'       =>              'put',
-        'update'    =>              'post',
+        'add'       =>              'post',
+        'update'    =>              'put',
         'delete'    =>              'delete',
         'get'       =>              'get',
     ];

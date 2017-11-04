@@ -16,7 +16,7 @@ date_default_timezone_set('Asia/Shanghai');
 
 // 自动加载
 spl_autoload_register(function($clazz){
-    require  str_replace('\\','/',$clazz . '.php');
+    require_once  str_replace('\\','/',$clazz . '.php');
 });
 
 // 加载配置
