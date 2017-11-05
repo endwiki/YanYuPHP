@@ -46,7 +46,7 @@ class Validation{
             $propertyName = $property->name;
             $property = $this->$propertyName;
             if('require' == $property[0]){
-                if(!isset($fields[$propertyName])  || '' != $fields[$propertyName]){
+                if(!isset($fields[$propertyName])){
                     throw new VerificationFailedException(100003,'字段: ' . $propertyName
                         . ' 验证失败,原因是:该字段必填!');
                 }
