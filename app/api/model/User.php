@@ -21,7 +21,8 @@ class User {
     public static function hasExistByUsername($username){
         $dbConfig = Config::get('database');
         $dbInstance = Database::getInstance($dbConfig['host'],$dbConfig['db'],$dbConfig['user'],$dbConfig['password']);
-        $queryUserInfoSql = 'SELECT user_id,username,password FROM user WHERE username=:username';
+        // 查询该用户是否存在
+        $queryUserInfoSql = 'SELECT user_id,username,password FROM user WHERE username=:username AND status=1';
         $statementObject = $dbInstance->prepare($queryUserInfoSql);
         $statementObject->execute(['username'=>$username]);
         $userInfo = $statementObject->fetch(\PDO::FETCH_ASSOC);
