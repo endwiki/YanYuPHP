@@ -1,12 +1,16 @@
-# Home Page
+# 个人博客
 
-## 版本更新记录
+## 验证器的使用 ##
 
-### 0.0.2 ###
+首先新建一个校验类,比如 `ArticleAdd`,并且继承 `src\framework\Validation` 类。
+    
+    class ArticleAdd extends Validation{}
+    
+然后在类里添加验证规则，例如字符串:
 
-1. 增加异常机制
-2. 增加 Restful 控制器
+    protected $title = array('require', 'string',1,20,'文章标题必须在 10 到 20 个字符以内!');
+    
+最后再控制器中使用该校验器，如下：
 
-### 0.0.1 ###
-
-1. 框架采用控制器模型分层模式
+    $params = Request::post();
+    (new ArticleAdd())->eachFields($params);
