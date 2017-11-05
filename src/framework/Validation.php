@@ -5,11 +5,15 @@
  * Date: 2017/11/5
  * Time: 15:38
  */
-namespace src\framework\Validation;
+namespace src\framework;
 
 use app\common\exceptions\VerificationFailedException;
 
 class Validation{
+
+    protected $code;
+    protected $message;
+
 
     public function setMap(Array $fields){
         foreach($fields as $field => $value){
@@ -42,8 +46,8 @@ class Validation{
             $propertyName = $property->name;
             $property = $this->$propertyName;
             if('require' == $property[0]){
-                if(!isset($fields[$property->name])  && '' != $fields[$property->name]){
-                    throw new VerificationFailedException(100003,'字段: ' . $property->name
+                if(!isset($fields[$propertyName])  || '' != $fields[$propertyName]){
+                    throw new VerificationFailedException(100003,'字段: ' . $propertyName
                         . ' 验证失败,原因是:该字段必填!');
                 }
             }
@@ -54,11 +58,16 @@ class Validation{
         // 检验类型
         switch($rule[1]){
             case 'string':
-                $result = false;
-                if(is_string($value) && mb_strlen($value,'utf8') <= $rule[2]){
-                    $result = true;
+                $result = true;
+                if(!is_string($value)){
+                    $result = false;
                 }
-                return $result;
+                if(mb_strlen($value,'utf8') < $rule[2]){
+                    $result = false;
+                }
+                if(mb_strlen($value,'utf8') > $rule[3]){
+                    $result = false;
+                }
                 break;
             case 'integer':
                 $result = filter_var($value,FILTER_VALIDATE_INT);
