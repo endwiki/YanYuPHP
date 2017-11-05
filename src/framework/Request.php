@@ -13,6 +13,16 @@ class Request{
 
     }
 
+    public static function getHeader(){
+        $header = apache_request_headers();
+        if(apache_request_headers()){
+            return $header;
+        }else{
+            return false;
+        }
+    }
+
+
     public static function post($key = null){
         if($key === null){
             return $_POST;
