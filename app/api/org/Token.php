@@ -56,19 +56,19 @@ class Token {
         // 解析token
         $tokenArr = explode('.',$token);
         if(3 !== count($tokenArr)){
-            throw new TokenCheckFailedException();
+            return false;
         }
         // $header = json_decode(base64_decode($tokenArr[0]));
         $payload = json_decode(base64_decode($tokenArr[1]));
         // 检查是否过期
         $now = time();
         if($now < $payload->nbf || $now > ($payload->iat + $payload->exp)){
-            throw new TokenOutTimeException();
+            return false;
         }
         // 检查是否被篡改
         $signature = hash('sha256',$tokenArr[0] . $tokenArr[1] . Config::get('SYSTEM_KEY'));
         if($tokenArr[2] !== $signature){
-            throw new TokenCheckFailedException();
+            return false;
         }else{
             return $payload->uuid;
         }
