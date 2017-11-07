@@ -8,19 +8,19 @@
 namespace src\framework;
 
 use app\common\exceptions\VerificationFailedException;
+use app\common\exceptions\VerifyTypeNotFoundException;
 
 class Validation{
 
     protected $code;
     protected $message;
 
-
-    public function setMap(Array $fields){
-        foreach($fields as $field => $value){
-            $this->$field = $value;
-        }
-    }
-
+    /**
+     * 遍历字段
+     * @param array $fields 参与验证的字段
+     * @return bool
+     * @throws VerificationFailedException [100003] 验证失败异常
+     */
     public function eachFields($fields){
         // 获取必填项
         $this->verifyRequire($fields);
@@ -30,8 +30,9 @@ class Validation{
             if(!is_null($rule)){
                 $result = $this->verifyRule($value,$rule);
                 if($result == false){
+                    $message = isset($rule['message']) ? $rule['message'] : '';
                     throw new VerificationFailedException(100003,'字段:' . $field . '验证失败,原因是:'
-                        . $rule[count($rule) - 1]);
+                        . $message);
                 }
             }
         }
@@ -45,7 +46,7 @@ class Validation{
         foreach($properties as $property){
             $propertyName = $property->name;
             $property = $this->$propertyName;
-            if('require' == $property[0]){
+            if($property['require']){
                 if(!isset($fields[$propertyName])){
                     throw new VerificationFailedException(100003,'字段: ' . $propertyName
                         . ' 验证失败,原因是:该字段必填!');
@@ -54,65 +55,27 @@ class Validation{
         }
     }
 
+    /**
+     * 验证指定值的规则
+     * @param mixed $value  验证的值
+     * @param string|array $rule 验证的规则
+     * @return bool|mixed
+     * @throws VerifyTypeNotFoundException [100004]没有找到对应的验证方法
+     * @throws \Exception
+     */
     protected function verifyRule($value,$rule){
-        // 检验类型
-        switch($rule[1]){
-            case 'string':
-                $result = true;
-                if(!is_string($value)){
-                    $result = false;
-                }
-                if(mb_strlen($value,'utf8') < $rule[2]){
-                    $result = false;
-                }
-                if(mb_strlen($value,'utf8') > $rule[3]){
-                    $result = false;
-                }
-                break;
-            case 'integer':
-                $result = filter_var($value,FILTER_VALIDATE_INT);
-                break;
-            case 'boolean':
-                $result = filter_var($value,FILTER_VALIDATE_BOOLEAN);
-                break;
-            case 'function':
-                if(!isset($rule[2])){
-                    throw \Exception($value . ' Call to undefined function!');
-                }
-                if(!is_callable($rule[2])){
-                    throw \Exception($rule[2] . ' callable is false');
-                }
-                $result = call_user_func($rule[2],$value);
-                break;
-            case 'method':
-                if(!isset($rule[2])){
-                    throw new \Exception($value . ' Call to undefined method!');
-                }
-                if(!method_exists($this,$rule[2])){
-                    throw new \Exception($value . ' method don\'t found!');
-                }
-                $method = $rule[2];
-                $result = $this->$method($value);
-                break;
-            case 'regular':
-                $result = $this->isRegular($value);
-                break;
-            case 'json':
-                $result = $this->verifyJson($value);
-                break;
-            default:
-                return true;
+        // 检测验证类型是否存在
+        $namespace = Config::get('VERIFY_CLASS_NAMESPACE');
+        $clazz = ucfirst(strtolower($rule['type'])) . 'Verify';
+        if(!class_exists($namespace . $clazz)){
+            throw new VerifyTypeNotFoundException(100004,'没有找到[' . $clazz . ']这个验证方法!');
         }
-        return $result;
-    }
-
-    // 验证 JSON 格式
-    public function verifyJson($value){
-        $result = json_decode($value);
-        if(false == $result || null == $result){
-            return false;
-        }
-        return true;
+        // 验证并返回结果
+        $clazz = $namespace . $clazz;
+        return (new $clazz)->verify([
+            'value' =>      $value,
+            'rule'  =>      $rule,
+        ]);
     }
 
     // 验证手机号码
