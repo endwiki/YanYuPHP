@@ -16,6 +16,8 @@ class Route{
 
     public static function check(){
         $requestUri = substr($_SERVER['REQUEST_URI'],1);
+        // 去除请求 URL 中的参数
+        $requestUri = substr($requestUri,0,strpos($requestUri,'?'));
         $requestToken = explode('/',$requestUri);
         // 获取模块、控制器、方法
         list(self::$module,self::$controller,self::$action) = $requestToken;
