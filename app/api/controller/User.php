@@ -7,14 +7,14 @@
  */
 namespace app\api\controller;
 
+use app\common\verifications\UserAdd;
+use app\common\verifications\UserLogin;
 use src\framework\Config;
 use src\framework\Database;
 use src\framework\Request;
 use src\framework\Response;
 use app\api\org\Token;
 use app\api\model\User as UserModel;
-use app\common\exceptions\UsernameHasRequireException;
-use app\common\exceptions\PasswordHasRequireException;
 use app\common\exceptions\RegisteredUserAlreadyExistsException;
 use app\common\exceptions\UserRegistrationFailedException;
 use app\common\exceptions\UsernameOrPasswordWrongException;
@@ -26,21 +26,14 @@ class User  {
 
     /**
      * 用户注册
-     * @throws PasswordHasRequireException
      * @throws RegisteredUserAlreadyExistsException
      * @throws UserRegistrationFailedException
-     * @throws UsernameHasRequireException
-     * return mixed
+     * @return mixed
      */
     public function add(){
         $params = Request::post();
         // 校验参数
-        if(!isset($params['username']) || is_null($params['username'])){
-            throw new UsernameHasRequireException();
-        }
-        if(!isset($params['password']) || is_null($params['password'])){
-            throw new PasswordHasRequireException();
-        }
+        (new UserAdd())->eachFields($params);
 
         $dbConfig = Config::get('database');
         $dbInstance = Database::getInstance($dbConfig['host'],$dbConfig['db'],$dbConfig['user'],$dbConfig['password']);
@@ -75,12 +68,7 @@ class User  {
     public function login(){
         $params = Request::post();
         // 校验参数
-        if(!isset($params['username']) || is_null($params['username'])){
-            throw new UsernameHasRequireException();
-        }
-        if(!isset($params['password']) || is_null($params['password'])){
-            throw new PasswordHasRequireException();
-        }
+        (new UserLogin())->eachFields($params);
 
         // 检查用户是否存在
         $userInfo = UserModel::hasExistByUsername($params['username']);
