@@ -10,5 +10,10 @@ namespace app\common\verifications;
 use src\framework\Validation;
 
 class CategoryAdd extends Validation{
-    protected $name = ['require','string',1,20,'文章类目为 1 到 15 个汉字'];
+    protected $name = [
+        'require'       =>      true,
+        'type'          =>      'string',
+        'length'        =>      '1,20',
+        'message'       =>      '文章类目为 1 到 15 个汉字'
+    ];
 }
