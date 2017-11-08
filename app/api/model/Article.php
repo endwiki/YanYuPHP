@@ -7,6 +7,7 @@
  */
 namespace app\api\model;
 
+use app\common\exceptions\QueryArticleFailedException;
 use src\framework\Config;
 use src\framework\Database;
 use app\common\exceptions\AddArticleAlreadyFailedException;
@@ -41,5 +42,29 @@ class Article {
             throw new AddArticleAlreadyFailedException();
         }
         return true;
+    }
+
+    /**
+     * 获取文章列表
+     * @param integer $pageNo 分布数量
+     * @param integer $pageSize 分页大小
+     * @return array
+     * @throws QueryArticleFailedException [300002]文章查询失败
+     */
+    public static function getList($pageNo,$pageSize){
+        $dbConfig = Config::get('database');
+        $dbInstance = Database::getInstance($dbConfig['host'],$dbConfig['db'],$dbConfig['user'],$dbConfig['password']);
+        $queryArticleSql = 'SELECT a.article_id,a.title,a.user_id,a.content,
+          a.category_id,a.update_time,c.name,u.username
+          FROM article AS a LEFT JOIN category AS c ON a.category_id = c.category_id
+          LEFT JOIN user AS u ON a.user_id = u.user_id WHERE 1=1 ORDER BY a.create_time DESC 
+          LIMIT ' . $pageNo . ',' . $pageSize;
+        $statementObject = $dbInstance->prepare($queryArticleSql);
+        $queryResult = $statementObject->execute();
+        if($queryResult == false){
+            $statementObject->debugDumpParams();
+            throw new QueryArticleFailedException();
+        }
+        return $statementObject->fetchAll(\PDO::FETCH_ASSOC);
     }
 }
