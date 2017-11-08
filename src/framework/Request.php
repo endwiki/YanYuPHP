@@ -10,7 +10,7 @@ namespace src\framework;
 class Request{
 
     public static function get(){
-
+        return $_GET;
     }
 
     public static function getHeader(){
