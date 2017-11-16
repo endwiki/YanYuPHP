@@ -8,38 +8,50 @@
 namespace src\framework;
 
 use app\common\exceptions\CreateDatabaseInstanceFailedException;
+use src\framework\databases\MySql;
 
 class Database {
 
     private static $instance = [];
+    private static $mysql = null;
 
     /**
      * 获取数据库实例
-     * @param string $host 数据库 URL
-     * @param string $dbName 数据库名
-     * @param null $userName 数据库用户名
-     * @param null $password 数据库密码
-     * @param int $port default 3306
-     * @param string $charset default UTF8
-     * @return object
+     * @return MySql
      * @throws CreateDatabaseInstanceFailedException [300001]创建数据库实例失败
      */
-    public static function getInstance($host,$dbName,$userName = null,$password = null,$port = 3306,$charset = 'UTF8'){
+    public static function getInstance(){
+        $dbConfig = self::getDefaultConfig();
         // 创建实例唯一标识
-        $id = serialize($host . $dbName . $port);
+        $id = serialize($dbConfig['host'] . $dbConfig['db'] . $dbConfig['port']);
         $instances = self::$instance;
         if(!isset($instances[$id])){
-            if(is_null($userName) || is_null($password)){
+            if(is_null($dbConfig['user']) || is_null($dbConfig['password'])){
                 throw new CreateDatabaseInstanceFailedException();
             }
             // 创建实例
-            $dsn = 'mysql:dbname=' . $dbName . ';host=' . $host . ';port=' . $port . ';charset=' . $charset;
+            $dsn = 'mysql:dbname=' . $dbConfig['db'] . ';host=' . $dbConfig['host'] . ';port=' . $dbConfig['port']. ';charset=' . $dbConfig['charset'];
             try{
-                $instances[$id] = new \PDO($dsn,$userName,$password);
+                $instances[$id] = new \PDO($dsn,$dbConfig['user'],$dbConfig['password']);
             } catch(\PDOException $e){
                 throw new CreateDatabaseInstanceFailedException();
             }
         }
-        return $instances[$id];
+        // 避免重复实例化 MySQL 类
+        $mysqlInstance = self::$mysql;
+        if(is_null($mysqlInstance)){
+            self::$mysql = self::$mysql = new MySql($instances[$id]);
+        }
+        return self::$mysql;
     }
+
+    /**
+     * 获取数据库默认配置
+     * @return mixed
+     */
+    private static function getDefaultConfig(){
+        $dbConfig = Config::get('database');
+        return $dbConfig;
+    }
+
 }
