@@ -166,8 +166,27 @@ class MySql {
 
     }
 
-    public function update(){
-
+    /**
+     * 更新记录
+     * @param array $data 将要更新的字段和字段值
+     * @return bool
+     */
+    public function update(array $data){
+        $values = [];
+        $updateFields = '';
+        // 拼接更新的字段
+        foreach($data as $item => $value){
+            $updateFields .= '`' . $item . '` = ? ,';
+            $values[] = $value;
+        }
+        // 去除末尾多余的逗号
+        $updateFields = substr($updateFields , 0 , mb_strlen($updateFields) - 1);
+        $sql = 'UPDATE ' . $this->table . ' SET ' . $updateFields . ' WHERE ' . $this->where;
+        $statementObject = $this->databaseInstance->prepare($sql);
+        // 将更新的预处理字段值和 Where 条件中的预处理字段值组合
+        $values = array_merge($values,$this->prepareValues);
+        $updateResult = $statementObject->execute($values);
+        return $updateResult;
     }
 
     public function sum(){
