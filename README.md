@@ -47,6 +47,38 @@
     
 ## 数据库的操作 ##
 
+### 配置数据库 ###
+
+比如，在`app/common/configs/`目录下新建`database.php`配置文件，示例如下:
+
+```
+return [
+    'host'      =>      'localhost',
+    'port'      =>      '3306',
+    'db'        =>      'file',
+    'user'      =>      'root',
+    'password'  =>      '',
+    'charset'   =>      'UTF8',
+];
+
+```
+
+然后在`app/common/App.php`中引入改配置文件:
+
+```
+'database'    =>      include 'Database.php',
+```
+
+> 也可以把配置文件放在任意目录，只要在配置文件中正确引入即可。
+
+### 获取数据库的实例 ###
+
+在配置完了数据库之后，就可以在程序中获取程序的实例了:
+
+```
+$dbInstance = src\framework\Database::getInstance();
+```
+
 ### 查询数据 ###
 
 如果不加上`limit`语句的话，默认返回第一条数据。
