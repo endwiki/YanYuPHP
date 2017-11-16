@@ -1,4 +1,34 @@
-# 个人博客
+# 自己长期维护的项目 #
+
+## 项目简介 ##
+
+这是自己的一个项目，用来检验应用学习成果。也方便自己和家人的日常生活，算是一个工具集吧。
+和商业的项目不同的是，首先这是开源的，谁都可以拿去任意使用。然后这也将长期维护。
+
+## 软硬件要求 ##
+
+|要求项|版本|说明|
+|---|---|---|
+|PHP|7.0以及以上|-|
+|MySQL/MariaDB|-|-|
+|Nginx/Apache|-|-|
+|OS|Windows/Linux|-|
+
+## 部署 ##
+
+### URL 重写 ###
+
+如果是 Apache 服务器的话，在代码的根目录下创建`.htaccess`文件，然后写入如下代码：
+
+```
+<IfModule mod_rewrite.c>
+ RewriteEngine on
+ RewriteCond %{REQUEST_FILENAME} !-d
+ RewriteCond %{REQUEST_FILENAME} !-f
+ RewriteRule ^(.*)$ index.php/$1 [QSA,PT,L]
+</IfModule>
+
+```
 
 ## 验证器的使用 ##
 
@@ -14,3 +44,47 @@
 
     $params = Request::post();
     (new ArticleAdd())->eachFields($params);
+    
+## 数据库的操作 ##
+
+### 查询数据 ###
+
+如果不加上`limit`语句的话，默认返回第一条数据。
+
+```
+$queryResult = $dbInstance->table('file')
+    ->field(['id','name','path','status'])
+    ->where([
+        'name'  =>    ['like','%bc%'],
+    ])
+    ->limit(50)
+    ->fetch();
+```
+
+### 更新数据 ###
+
+如果更新成功，返回`true`,如果更新失败，返回`false`。
+
+```
+$updateResult = $dbInstance->table('file')
+     ->where(['id'    =>  1])
+     ->update([
+        'name'  =>      'xiao',
+     ]);
+     
+```
+
+### 新增数据 ###
+
+如果新增数据成功，返回`true`,如果插入失败，返回`false`。
+
+```
+$insertResult = $dbInstance->table('file')
+    ->add([
+        'id'    =>      2,
+        'name'  =>      'ok',
+        'path'  =>      '/etc/log',
+        'level' =>      11,
+        'status'    =>  3,
+    ]);
+```

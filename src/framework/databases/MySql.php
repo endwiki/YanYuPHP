@@ -158,11 +158,35 @@ class MySql {
         return $this->lastSql;
     }
 
-    public function insert(){
+    /**
+     * 新增数据
+     * @param array $data 将要新增的字段和字段值
+     * @return bool
+     */
+    public function add(array $data){
+        $fields = [];
+        $values = [];
+        // 遍历插入的字段和值
+        foreach($data as $item => $value){
+            $fields[] = $item;
+            $values[] = $value;
+        }
+        $fieldCount = count($fields);
+        // 填充符合字段个数的占位符,拼接 SQL
+        $placeholder = array_fill(0,$fieldCount,'?');
+        $fields = '`' . implode('`,`',$fields) . '`';
+        $sql = 'INSERT INTO ' . $this->table
+            . '( ' . $fields
+            . ') VALUE ('
+            . implode(',',$placeholder) . ')';
+        // 预处理并执行 SQL
+        $statementObject = $this->databaseInstance->prepare($sql);
+        $insertResult = $statementObject->execute($values);
 
+        return $insertResult;
     }
 
-    public function insertAll(){
+    public function addAll(){
 
     }
 
