@@ -32,6 +32,8 @@
 
 ## 验证器的使用 ##
 
+### 基本使用 ###
+
 首先新建一个校验类,比如 `ArticleAdd`,并且继承 `src\framework\Validation` 类。
     
     class ArticleAdd extends Validation{}
@@ -44,6 +46,66 @@
 
     $params = Request::post();
     (new ArticleAdd())->eachFields($params);
+    
+### 方法验证中使用参数注入 ###
+
+对于复杂的校验，我们可以使用方法校验。即指定类型为`Method`,
+自己指定方法所在的类名和方法名，如下代码:
+
+```
+protected $word = [
+     'type'      =>  'Method',
+     'class'     =>  'app\\common\\verifications\\WordAdd',
+     'method_name'   =>  'wordMustNotExist',
+     'message'       =>  '该单词已经存在!'
+];
+
+```
+实用方法验证可以对单个值进行复杂的校验，比如检查是否在数据库中存在。
+但有时候我们需要借助其他的参数来校验某个参数，比如我们需要检查某个用户下
+是否已经存在某个数据的时候，我们可以使用在方法验证中使用参数注入。
+
+在方法验证中，我们可以使用`injection_args`属性来指定注入的参数，前提是注入的参数
+需要出现在校验的参数中，可以通过如下的代码加入欲注入的参数:
+
+```
+$params = Request::post();
+$params['user_id'] = $this->uid;
+// 在校验类中指定注入参数
+protected $word = [
+    // 其他参数
+    'injection_args' => ['user_id'],    // 参数注入
+    'message'   =>  '该用户已经添加该单词'
+];
+```
+
+### 多重验证 ###
+
+有时候，我们需要对一个字段进行复杂的组合验证。比如在单词本的应用中，在添加一个单词的时候，
+,即需要检验其基本的数据类型，又要检验其是否在数据表中存在。
+这时候，我们就可以使用多重验证功能。
+
+在验证类中，添加验证规则如下,与基本验证不同的是，多重验证是二维数组:
+
+```
+protected $word = [
+        [
+            'require'   =>  true,
+            'type'      =>  'String',
+            'length'    =>  '1,64',
+            'message'   =>  '单词必须在 1 到 64 个字符以内!'
+        ],
+        [
+            'type'      =>  'Method',
+            'class'     =>  'app\\common\\verifications\\WordAdd',
+            'method_name'   =>  'wordMustNotExist',
+            'message'       =>  '该单词已经存在!'
+        ]
+    ];
+```
+多重验证允许我们将多个验证规则写成二维数组。
+
+
     
 ## 数据库的操作 ##
 
