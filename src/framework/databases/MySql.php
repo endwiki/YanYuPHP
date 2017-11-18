@@ -116,7 +116,6 @@ class MySql {
         $this->lastSql = $sql;              // 记录最后一次执行的 SQL
         $statementObject = $this->databaseInstance->prepare($sql);
         $statementObject->execute($this->prepareValues);
-        // $statementObject->debugDumpParams();
         $this->clear();
 
         return $statementObject->fetch(\PDO::FETCH_ASSOC);
@@ -133,7 +132,6 @@ class MySql {
         $this->order = null;
         $this->group = null;
         $this->having = null;
-        $this->lastSql = null;
         $this->limit = null;
         $this->prepareValues = [];
     }
