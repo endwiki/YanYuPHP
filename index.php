@@ -16,21 +16,30 @@ date_default_timezone_set('Asia/Shanghai');
 
 // 自动加载
 spl_autoload_register(function($clazz){
-    require_once  str_replace('\\','/',$clazz . '.php');
+    $clazz = str_replace('\\','/',$clazz . '.php');
+    if(!file_exists($clazz)){
+        throw new \app\common\exceptions\ClassNotFoundException();
+    }
+    require_once $clazz;
 });
 
 // 加载配置
 \src\framework\Config::load(include APP_PATH . '/common/configs/App.php');
 
 // 设置错误句柄
-//set_error_handler(function(){
-//
+//set_error_handler(function($code,$stack,$filePath,$position){
+////    echo json_encode([
+////        'code'  =>      $code,
+////        'stack' =>      $stack,
+////        'filePath'  =>  $filePath,
+////        'position'  =>  $position,
+////    ]);
 //});
 
-// 设置异常句柄
+//// 设置异常句柄
 set_exception_handler(function($message){
-    //    $exceptionHandler = \src\framework\Config::get('EXCEPTION_HANDLER');
-    //    new $exceptionHandler();
+//    //    $exceptionHandler = \src\framework\Config::get('EXCEPTION_HANDLER');
+//    //    new $exceptionHandler();
 });
 
 // 检查路由
