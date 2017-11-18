@@ -32,4 +32,25 @@ class Word {
             ]);
         return $result;
     }
+
+    /**
+     * 判断单词是否在指定单词本中存在
+     * @param $word 单词名称
+     * @param integer $bookId 单词本ID
+     * @param integer $userId 用户ID
+     * @return bool
+     */
+    public static function hasExistByBook($word,$bookId,$userId){
+        $databaseInstance = Database::getInstance();
+        $wordInfo = $databaseInstance->table('word')
+            ->where([
+                'word'  =>  $word,
+                'user_id'   =>  $userId,
+                'book_id'    =>  $bookId
+            ])->fetch();
+        if(!$wordInfo){
+            return false;
+        }
+        return true;
+    }
 }

@@ -42,6 +42,7 @@ class WordBook{
             ->where([
                 'book_id'  =>   $bookId
             ])->fetch();
+
         if(!$bookInfo){
             return false;
         }

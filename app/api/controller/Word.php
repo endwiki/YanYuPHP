@@ -24,6 +24,8 @@ class Word extends Authorization {
      */
     public function add(){
         $params = Request::post();
+        // 为了校验是否存在同用户同单词本下存在相同单词
+        $params['userId'] = $this->uid;
         (new WordAdd())->eachFields($params);
         $result = WordModel::add($params['word'],$params['mean'],$params['book_id'],$this->uid);
         if(!$result){
