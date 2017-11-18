@@ -61,7 +61,7 @@ protected $word = [
 ];
 
 ```
-实用方法验证可以对单个值进行复杂的校验，比如检查是否在数据库中存在。
+使用方法验证可以对单个值进行复杂的校验，比如检查是否在数据库中存在。
 但有时候我们需要借助其他的参数来校验某个参数，比如我们需要检查某个用户下
 是否已经存在某个数据的时候，我们可以使用在方法验证中使用参数注入。
 
@@ -71,6 +71,8 @@ protected $word = [
 ```
 $params = Request::post();
 $params['user_id'] = $this->uid;
+(new WordAdd())->eachFields($params);
+
 // 在校验类中指定注入参数
 protected $word = [
     // 其他参数
