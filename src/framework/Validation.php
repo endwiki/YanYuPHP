@@ -31,13 +31,13 @@ class Validation{
                 // 判断是否为多重校验
                 if(isset($rule[0]) && is_array($rule[0])){
                     foreach($rule as $item => $ruleValue){
-                        $result = $this->verifyRule($value,$ruleValue);
+                        $result = $this->verifyRule($value,$ruleValue,$fields);
                         if($result == false){
                             break;
                         }
                     }
                 }else{
-                    $result = $this->verifyRule($value,$rule);
+                    $result = $this->verifyRule($value,$rule,$fields);
                 }
                 if($result == false){
                     $message = isset($rule['message']) ? $rule['message'] : $ruleValue['message'];
@@ -77,11 +77,12 @@ class Validation{
      * 验证指定值的规则
      * @param mixed $value  验证的值
      * @param string|array $rule 验证的规则
+     * @param array $fields 接口的字段,以备参数注入
      * @return bool|mixed
      * @throws VerifyTypeNotFoundException [100004]没有找到对应的验证方法
      * @throws \Exception
      */
-    protected function verifyRule($value,$rule){
+    protected function verifyRule($value,$rule,$fields){
         // 检测验证类型是否存在
         $namespace = Config::get('VERIFY_CLASS_NAMESPACE');
         $clazz = ucfirst(strtolower($rule['type'])) . 'Verify';
@@ -93,6 +94,7 @@ class Validation{
         return (new $clazz)->verify([
             'value' =>      $value,
             'rule'  =>      $rule,
+            'fields'    =>  $fields,
         ]);
     }
 

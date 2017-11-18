@@ -33,7 +33,19 @@ class MethodVerify implements ValidationInterface {
             if(!method_exists($class,$method)){
                 throw new MethodNotFoundException(100006,$className . '::' . $method . '没有找到!');
             }
-            if(!$class->$method($params['value'])){
+            // 判断是否存在参数注入
+            $injectionArgs = null;
+            if(isset($params['rule']['injection_args'])){
+                foreach($params['rule']['injection_args'] as $item => $arg){
+                    $injectionArgs[$arg] = $params['fields'][$arg];
+                }
+            }
+            if(is_null($injectionArgs)){
+                $result = $class->$method($params['value']);
+            }else{
+                $result = $class->$method($params['value'],$injectionArgs);
+            }
+            if(!$result){
                 return false;
             }
         }
