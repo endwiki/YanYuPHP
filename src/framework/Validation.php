@@ -28,16 +28,28 @@ class Validation{
         foreach($fields as $field => $value){
             $rule = isset($this->$field) ? $this->$field : null;
             if(!is_null($rule)){
-                $result = $this->verifyRule($value,$rule);
+                // 判断是否为多重校验
+                if(isset($rule[0]) && is_array($rule[0])){
+                    foreach($rule as $item => $ruleValue){
+                        $result = $this->verifyRule($value,$ruleValue);
+                        if($result == false){
+                            break;
+                        }
+                    }
+                }else{
+                    $result = $this->verifyRule($value,$rule);
+                }
                 if($result == false){
-                    $message = isset($rule['message']) ? $rule['message'] : '';
+                    $message = isset($rule['message']) ? $rule['message'] : $ruleValue['message'];
                     throw new VerificationFailedException(100003,'字段:' . $field . '验证失败,原因是:'
                         . $message);
                 }
+
             }
         }
         return true;
     }
+
 
     // 验证是否必填
     protected function verifyRequire($fields){
@@ -46,7 +58,13 @@ class Validation{
         foreach($properties as $property){
             $propertyName = $property->name;
             $property = $this->$propertyName;
-            if($property['require']){
+            // 判断是否存在多重校验的情况
+            if(!isset($property['require'])){
+                $isRequire = $property[0]['require'];
+            }else{
+                $isRequire = $property['require'];
+            }
+            if($isRequire){
                 if(!isset($fields[$propertyName])){
                     throw new VerificationFailedException(100003,'字段: ' . $propertyName
                         . ' 验证失败,原因是:该字段必填!');
