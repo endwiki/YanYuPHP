@@ -6,9 +6,7 @@
  * Time: 9:30
  */
 namespace src\framework\databases;
-
 class MySql {
-
     private $databaseInstance = null;               // 数据库实例
     private $fields = null;
     private $where = null;
@@ -19,8 +17,6 @@ class MySql {
     private $lastSql = null;
     private $limit = null;
     private $prepareValues = [];          // PDO 预处理的字段
-
-
     /**
      * MySql constructor.
      * @param \PDO $database \PDO 实例
@@ -28,7 +24,6 @@ class MySql {
     public function __construct(\PDO $database){
         $this->databaseInstance = $database;
     }
-
     /**
      * 指定条件
      * @param array $conditions 指定的条件
@@ -41,7 +36,6 @@ class MySql {
                 $operation = $this->operationConvert($value[0]);
                 $value = $value[1];
             }
-
             $operation = isset($operation) ? (' ' . $operation . ' ') : ' = ';
             $this->where .= ' AND `' . $field . '`' . $operation . '?';
             // 纪录预处理的字段和值的映射
@@ -50,7 +44,6 @@ class MySql {
         $this->where = substr($this->where,4);
         return $this;
     }
-
     /**
      * 操作符转换
      * @param String $operation 操作符
@@ -72,7 +65,6 @@ class MySql {
         }
         return $map[$operation];
     }
-
     /**
      * 指定表名
      * @param String $name 表名
@@ -82,7 +74,6 @@ class MySql {
         $this->table = $name;
         return $this;
     }
-
     /**
      * 指定字段
      * @param array $fields  字段
@@ -92,24 +83,14 @@ class MySql {
         $this->fields = '`' . implode('`,`',$fields) . '`';
         return $this;
     }
-
     public function join(array $join){
-
     }
-
-
     public function group(){
-
     }
-
     public function having(){
-
     }
-
     public function order(){
-
     }
-
     /**
      * 获取纪录
      * @return mixed
@@ -134,12 +115,28 @@ class MySql {
             . ' LIMIT ' . $this->limit;
         $this->lastSql = $sql;              // 记录最后一次执行的 SQL
         $statementObject = $this->databaseInstance->prepare($sql);
-
         $statementObject->execute($this->prepareValues);
-        $statementObject->debugDumpParams();
+        // $statementObject->debugDumpParams();
+        $this->clear();
+
         return $statementObject->fetch(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * 每次执行完之后清理数据
+     * @return void
+     */
+    public function clear(){
+        $this->fields = null;
+        $this->where = null;
+        $this->table = null;
+        $this->order = null;
+        $this->group = null;
+        $this->having = null;
+        $this->lastSql = null;
+        $this->limit = null;
+        $this->prepareValues = [];
+    }
     /**
      * 指定返回纪录条数
      * @param int $number 纪录条数
@@ -149,7 +146,6 @@ class MySql {
         $this->limit = $number;
         return $this;
     }
-
     /**
      * 获取最后一次执行的 SQL
      * @return string
@@ -157,7 +153,6 @@ class MySql {
     public function getLastSql(){
         return $this->lastSql;
     }
-
     /**
      * 新增数据
      * @param array $data 将要新增的字段和字段值
@@ -182,14 +177,10 @@ class MySql {
         // 预处理并执行 SQL
         $statementObject = $this->databaseInstance->prepare($sql);
         $insertResult = $statementObject->execute($values);
-
         return $insertResult;
     }
-
     public function addAll(){
-
     }
-
     /**
      * 更新记录
      * @param array $data 将要更新的字段和字段值
@@ -212,20 +203,12 @@ class MySql {
         $updateResult = $statementObject->execute($values);
         return $updateResult;
     }
-
     public function sum(){
-
     }
-
     public function count(){
-
     }
-
     public function delete(){
-
     }
-
     public function getField(){
-
     }
 }
