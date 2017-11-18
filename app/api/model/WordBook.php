@@ -30,4 +30,21 @@ class WordBook{
             ]);
         return $result;
     }
+
+    /**
+     * 根据单词本ID检查单词本是否存在
+     * @param int $bookId 单词本ID
+     * @return bool
+     */
+    public static function hasExistByBookId(int $bookId){
+        $databaseInstance = Database::getInstance();
+        $bookInfo = $databaseInstance->table('word_book')
+            ->where([
+                'book_id'  =>   $bookId
+            ])->fetch();
+        if(!$bookInfo){
+            return false;
+        }
+        return true;
+    }
 }
