@@ -49,7 +49,7 @@ class User {
         if(!$userInfo){
             throw new UserNotExistException();
         }
-        var_dump($userInfo);
+
         // 验证用户密码是否正确
         if(!password_verify($password,$userInfo['password'])){
             throw new UsernameOrPasswordWrongException();
