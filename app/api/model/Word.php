@@ -57,6 +57,12 @@ class Word {
         return true;
     }
 
+    /**
+     * 翻译文本
+     * @param String $text 翻译文本
+     * @param int $userId 用户ID
+     * @return mixed
+     */
     public static function textTranslate(String $text,int $userId){
         // 文本是否在数据库中存在纪录
         $textHash = md5(hash('sha256',$text));

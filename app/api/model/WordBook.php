@@ -32,6 +32,24 @@ class WordBook{
     }
 
     /**
+     * 获取单词本列表
+     * @param int $userId 用户ID
+     * @return mixed
+     */
+    public static function getList(int $userId){
+        $databaseInstance = Database::getInstance();
+        $wordBookList = $databaseInstance->table('word_book')
+            ->field(['book_id','title','description','create_time'])
+            ->where([
+                'user_id'   =>  $userId
+            ])
+            ->limit(10)
+            ->fetch();
+
+        return $wordBookList;
+    }
+
+    /**
      * 根据单词本ID检查单词本是否存在
      * @param int $bookId 单词本ID
      * @return bool
