@@ -8,6 +8,8 @@
 namespace app\api\controller;
 
 use app\common\exceptions\WordAddFailedException;
+use app\common\exceptions\TextTranslateFailedException;
+use app\common\verifications\WordQuery;
 use src\framework\Request;
 use app\common\verifications\WordAdd;
 use app\api\model\Word as WordModel;
@@ -34,6 +36,27 @@ class Word extends Authorization {
         Response::ajaxReturn([
             'code'  =>     600000,
             'message'   =>  '添加新单词成功',
+        ]);
+    }
+
+    /**
+     * 翻译接口
+     * @method POST
+     * @api api/word/query
+     * @throws TextTranslateFailedException [600002]翻译失败异常
+     * @return mixed
+     */
+    public function query(){
+        $params = Request::post();
+        (new WordQuery())->eachFields($params);
+        $result = WordModel::textTranslate($params['from_text'],$this->uid);
+        if(!$result){
+            throw new TextTranslateFailedException();
+        }
+        Response::ajaxReturn([
+            'code'  =>  610000,
+            'data'  =>  $result,
+            'message'   =>  '翻译成功!',
         ]);
     }
 

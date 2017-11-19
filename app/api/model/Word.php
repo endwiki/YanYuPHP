@@ -57,28 +57,56 @@ class Word {
         return true;
     }
 
+    public static function textTranslate(String $text,int $userId){
+        // 文本是否在数据库中存在纪录
+        $textHash = md5(hash('sha256',$text));
+        $databaseInstance = Database::getInstance();
+        $queryResult = $databaseInstance->table('text_translate_result')
+            ->field(['translate_text'])
+            ->where([
+                'text_hash' =>  $textHash
+            ])->fetch();
+        // 如果存在纪录,直接返回结果
+        if($queryResult){
+            return $queryResult['translate_text'];
+        }
+        // 如果不存在纪录,则调用百度翻译 API 查询结果并纪录到数据库
+        if($queryResult == false){
+            $queryResult = self::translate($text);
+            $databaseInstance->table('text_translate_result')
+                ->add([
+                    'text_hash' =>  $textHash,
+                    'translate_text'    =>  $queryResult,
+                    'create_time'   =>  time(),
+                    'user_id'  =>    $userId,
+                ]);
+        }
+
+        return $queryResult;
+    }
+
     /**
      * 请求百度翻译 API 自动翻译
-     * @param string $word 将要翻译的文本
+     * @param string $text 将要翻译的文本
      * @param string $from 翻译之前的语言 default 'auto'
      * @param string $to 翻译之后的语言 default 'auto'
      * @return mixed
      */
-    public static function translate($word,$from = 'auto',$to = 'auto'){
+    private static function translate($text,$from = 'auto',$to = 'auto'){
         // 百度翻译 API 免费额度为每月 200 万
         $appId = Config::get('baidu_translate_api_ak');     // 获取配置中的应用 ID
         $sk = Config::get('baidu_translate_api_sk');        // 获取配置中的应用密钥
         $salt = mt_rand(100000,999999);             // 随机数
-        $sign = md5($appId . $word . $salt . $sk);       // 计算签名
+        $sign = md5($appId . $text . $salt . $sk);       // 计算签名
         // 在发送 HTTP 请求之前要对各字段做 URL encode
-        $word = urlencode($word);
+        $text = urlencode($text);
         $from = urlencode($from);
         $to = urlencode($to);
         $appId = urlencode($appId);
         $salt = urlencode($salt);
         $sign = urlencode($sign);
         // 拼接 URL 并发送请求
-        $url = Config::get('baidu_translate_api_url') . '?q=' . $word . '&from=' . $from . '&to='
+        $url = Config::get('baidu_translate_api_url') . '?q=' . $text . '&from=' . $from . '&to='
             . $to . '&appid=' . $appId . '&salt=' . $salt . '&sign=' . $sign;
         $result = Request::sendGetRequest($url);
         $result = json_decode($result,true);
