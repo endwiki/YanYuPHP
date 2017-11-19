@@ -117,8 +117,10 @@ class MySql {
         $statementObject = $this->databaseInstance->prepare($sql);
         $statementObject->execute($this->prepareValues);
         $this->clear();
-
-        return $statementObject->fetch(\PDO::FETCH_ASSOC);
+        if($this->limit == 1){
+            return $statementObject->fetch(\PDO::FETCH_ASSOC);
+        }
+        return $statementObject->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
