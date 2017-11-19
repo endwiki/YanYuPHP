@@ -8,6 +8,7 @@
 namespace app\api\model;
 
 
+use app\common\exceptions\RegisteredUserAlreadyExistsException;
 use src\framework\Config;
 use src\framework\Database;
 
@@ -25,9 +26,29 @@ class User {
             ->where([
                 'username'  =>  $username,
             ])->fetch();
-        if($userInfo){
-            return $userInfo;
+        if(!$userInfo){
+            return false;
         }
-        return false;
+        return true;
+    }
+
+    /**
+     * 添加用户
+     * @param String $username 用户名
+     * @param String $password 密码
+     * @return bool
+     * @throws RegisteredUserAlreadyExistsException [200003]用户名已经注册异常
+     */
+    public static function addUser(String $username,String $password){
+        $databaseInstance = Database::getInstance();
+
+        $passwordHash = password_hash($password,PASSWORD_DEFAULT,['cost'=>12]);
+        $result = $databaseInstance->table('user')
+            ->add([
+                'username'  =>  $username,
+                'password'  =>  $passwordHash,
+                'register_time' =>  time()
+            ]);
+        return $result;
     }
 }
