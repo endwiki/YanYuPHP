@@ -28,12 +28,6 @@ class WordAdd extends Validation{
         ]
     ];
 
-    protected $mean = [
-        'require'   =>  false,
-        'type'      =>  'String',
-        'length'    =>  '0,255',
-        'message'   =>  '解释必须在 0 到 255 个字符以内!'
-    ];
     protected $book_id = [
         'require'   =>  true,
         'type'      =>  'Method',

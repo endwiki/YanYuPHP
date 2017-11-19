@@ -27,7 +27,7 @@ class Word extends Authorization {
         // 为了校验是否存在同用户同单词本下存在相同单词
         $params['userId'] = $this->uid;
         (new WordAdd())->eachFields($params);
-        $result = WordModel::add($params['word'],$params['mean'],$params['book_id'],$this->uid);
+        $result = WordModel::add($params['word'],$params['book_id'],$this->uid);
         if(!$result){
             throw new WordAddFailedException();
         }
@@ -36,4 +36,5 @@ class Word extends Authorization {
             'message'   =>  '添加新单词成功',
         ]);
     }
+
 }
