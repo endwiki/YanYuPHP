@@ -9,6 +9,40 @@ namespace src\framework;
 
 class Request{
 
+    /**
+     * GET 请求方法
+     * @param String 请求路径
+     * @return mixed
+     */
+    public static function sendGetRequest($url){
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_URL,$url);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch,CURLOPT_HEADER,0);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return $response;
+    }
+    /**
+     * POST 请求方法
+     * @param String $url 请求路径
+     * @param String $data 请求数据
+     * @return mixed
+     */
+    public static function sendPostRequest($url,$data){
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_URL,$url);
+        // 跳过 HTTPS 检查
+        curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,false);
+        curl_setopt($ch,CURLOPT_SSL_VERIFYHOST,false);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch,CURLOPT_POST,1);
+        curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return $response;
+    }
+
     public static function get(){
         return $_GET;
     }
