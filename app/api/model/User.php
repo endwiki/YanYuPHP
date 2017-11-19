@@ -8,7 +8,10 @@
 namespace app\api\model;
 
 
+use app\api\org\Token;
 use app\common\exceptions\RegisteredUserAlreadyExistsException;
+use app\common\exceptions\UsernameOrPasswordWrongException;
+use app\common\exceptions\UserNotExistException;
 use src\framework\Config;
 use src\framework\Database;
 
@@ -30,6 +33,45 @@ class User {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 用户登陆
+     * @param String $username 用户名
+     * @param String $password 用户密码
+     * @return mixed
+     * @throws UserNotExistException [200006]用户不存在异常
+     * @throws UsernameOrPasswordWrongException [200005]用户名密码错误异常
+     */
+    public static function login(String $username,String $password){
+        // 验证用户是否存在
+        $userInfo = self::getUserInfo($username);
+        if(!$userInfo){
+            throw new UserNotExistException();
+        }
+        var_dump($userInfo);
+        // 验证用户密码是否正确
+        if(!password_verify($password,$userInfo['password'])){
+            throw new UsernameOrPasswordWrongException();
+        }
+        // 获取 Token
+        $token = Token::createToken($userInfo['user_id']);
+        return $token;
+    }
+
+    /**
+     * 根据用户名获取用户信息
+     * @param String $username 用户名
+     * @return mixed
+     */
+    public static function getUserInfo(String $username){
+        $databaseInstance = Database::getInstance();
+        $userInfo = $databaseInstance->table('user')
+            ->where([
+                'username'  =>  $username,
+            ])->fetch();
+
+        return $userInfo;
     }
 
     /**

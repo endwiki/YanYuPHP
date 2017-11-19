@@ -11,7 +11,6 @@ use app\common\verifications\UserAdd;
 use app\common\verifications\UserLogin;
 use src\framework\Request;
 use src\framework\Response;
-use app\api\org\Token;
 use app\api\model\User as UserModel;
 use app\common\exceptions\UserRegistrationFailedException;
 use app\common\exceptions\UsernameOrPasswordWrongException;
@@ -52,23 +51,11 @@ class User  {
         // 校验参数
         (new UserLogin())->eachFields($params);
 
-        // 检查用户是否存在
-        $userInfo = UserModel::hasExistByUsername($params['username']);
-        if(!$userInfo){
-            throw new UserNotExistException();
-        }
-
-        // 校验用户名和密码
-        if(false == password_verify($params['password'],$userInfo['password'])){
-            throw new UsernameOrPasswordWrongException();
-        }
-
-        // 分发 Token
-        $token = Token::createToken($userInfo['user_id']);
+        $token = UserModel::login($params['username'],$params['password']);
         Response::ajaxReturn([
             'code'      =>      210000,
             'msg'       =>      '恭喜您,登陆成功!',
-            'token'     =>      $token,
+            'data'     =>      $token,
         ]);
     }
 
