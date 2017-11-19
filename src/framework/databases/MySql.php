@@ -116,10 +116,12 @@ class MySql {
         $this->lastSql = $sql;              // 记录最后一次执行的 SQL
         $statementObject = $this->databaseInstance->prepare($sql);
         $statementObject->execute($this->prepareValues);
-        $this->clear();
+        // 之所以写再次'$this->clear()',是为了防止'$this->limit'判断之前被清空
         if($this->limit == 1){
+            $this->clear();
             return $statementObject->fetch(\PDO::FETCH_ASSOC);
         }
+        $this->clear();
         return $statementObject->fetchAll(\PDO::FETCH_ASSOC);
     }
 
