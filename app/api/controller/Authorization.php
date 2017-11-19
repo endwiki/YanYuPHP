@@ -21,7 +21,7 @@ class Authorization {
     public function __construct(){
         // 检查用户是否登陆
         $header = Request::getHeader();
-        if(!$header){
+        if(!isset($header['Authorization'])){
             throw new GetRequestHeaderFailedException();
         }
         // 获取用户 ID
