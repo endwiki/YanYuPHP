@@ -6,6 +6,7 @@
  * Time: 9:30
  */
 namespace src\framework\databases;
+use src\framework\exceptions\DatabaseInsertDataHasEmptyException;
 use src\framework\exceptions\DatabaseJoinTypeNotMissException;
 use src\framework\exceptions\DatabaseTableNotMissException;
 
@@ -78,6 +79,7 @@ class MySql {
         $this->table = $name;
         return $this;
     }
+
     /**
      * 指定字段
      * @param array $fields  字段
@@ -229,8 +231,40 @@ class MySql {
         $insertResult = $statementObject->execute($values);
         return $insertResult;
     }
-    public function addAll(){
+
+    /**
+     * 批量插入数据
+     * @param array $dataList 将要插入的行数据
+     * @return bool
+     * @throws DatabaseInsertDataHasEmptyException [100009]插入数据库的数据为空异常
+     */
+    public function addAll(array $dataList){
+        // 检查数据是否为空
+        if(!isset($dataList[0])){
+            throw new DatabaseInsertDataHasEmptyException();
+        }
+        $insertValue = '';          // 存储插入语句的 VALUES 部分
+        // 遍历数据
+        foreach($dataList as $dataIndex => $data){
+            $fields = [];      // 存储字段
+            foreach($data as $field => $value){
+                $fields[$field] = $field;           // 存储字段
+                $this->prepareValues[] = $value;    // 存储值
+            }
+            $insertValue .= ',(' . implode(','
+                    ,array_fill(0,count($fields),'?')
+                ) . ')';
+        }
+        // 拼接 SQL 并执行
+        $sql = 'INSERT INTO `' . $this->table
+            . '` (' . implode(',',$fields) . ') VALUES '
+            . substr($insertValue,1,strlen($insertValue)) . ';';
+        $this->lastSql = $sql;              // 保存 SQL
+        $statementObject = $this->databaseInstance->prepare($sql);
+        $result = $statementObject->execute($this->prepareValues);
+        return $result;
     }
+
     /**
      * 更新记录
      * @param array $data 将要更新的字段和字段值
