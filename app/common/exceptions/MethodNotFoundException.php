@@ -9,5 +9,5 @@ namespace app\common\exceptions;
 
 class MethodNotFoundException extends ExceptionHandler{
     protected $code = 100006;
-    protected $message = '成员方法没有找到!';
+    protected $message = '控制器方法没有找到!';
 }
