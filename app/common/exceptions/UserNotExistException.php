@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class UserNotExistException extends ExceptionHandler{
     protected $code = 200006;
     protected $message = '用户名或密码错误!';

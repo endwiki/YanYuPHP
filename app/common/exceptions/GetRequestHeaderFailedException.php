@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class GetRequestHeaderFailedException extends ExceptionHandler{
     protected $code = 100002;
     protected $message = '获取 HTTP 信息发生错误!';

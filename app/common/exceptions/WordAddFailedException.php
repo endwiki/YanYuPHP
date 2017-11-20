@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class WordAddFailedException extends ExceptionHandler{
     protected $code = 600001;
     protected $message = '添加单词失败,请稍后再试!';

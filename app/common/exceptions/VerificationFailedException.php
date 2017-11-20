@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class VerificationFailedException extends ExceptionHandler{
     protected $code = 100003;
     protected $message = '参数校验错误!';

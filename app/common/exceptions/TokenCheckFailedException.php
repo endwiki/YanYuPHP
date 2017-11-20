@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class TokenCheckFailedException extends ExceptionHandler{
     protected $code = 200007;
     protected $message = 'Token 校验失败!';

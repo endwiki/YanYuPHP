@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class AddCategoryAlreadyFailedException extends ExceptionHandler{
     protected $code = 400001;
     protected $message = '不好意思,类目新增过程中出现了意外!';

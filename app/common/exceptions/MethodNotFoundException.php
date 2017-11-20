@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class MethodNotFoundException extends ExceptionHandler{
     protected $code = 100006;
     protected $message = '成员方法没有找到!';

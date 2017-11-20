@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class CategoryNameAlreadyExistException extends ExceptionHandler {
     protected $code = 400002;
     protected $message = '您指定的类目名称已经存在!';

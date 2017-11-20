@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class PasswordHasRequireException extends ExceptionHandler{
 
     protected $code = 200003;

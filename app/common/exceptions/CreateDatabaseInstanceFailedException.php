@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class CreateDatabaseInstanceFailedException extends ExceptionHandler{
 
     protected $code = 300001;

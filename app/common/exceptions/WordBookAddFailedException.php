@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class WordBookAddFailedException extends ExceptionHandler{
     protected $code = 500001;
     protected $message = '添加单词本失败,请稍后再试!';

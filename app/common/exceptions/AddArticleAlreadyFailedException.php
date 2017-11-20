@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class AddArticleAlreadyFailedException extends ExceptionHandler{
     protected $code = 300001;
     protected $message = '不好意思,文章发布的过程中出现错误,请稍后再试!';

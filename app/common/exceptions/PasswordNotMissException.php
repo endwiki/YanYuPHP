@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class PasswordNotMissException extends ExceptionHandler{
     protected $code = 700002;
     protected $message = '密码不存在!';

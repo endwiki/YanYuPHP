@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class TextTranslateFailedException extends ExceptionHandler {
     protected $code = 600002;
     protected $message = '翻译失败，请稍后再试!';
