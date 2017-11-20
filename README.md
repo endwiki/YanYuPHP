@@ -172,6 +172,8 @@ $updateResult = $dbInstance->table('file')
 
 ### 新增数据 ###
 
+#### 插入单条数据 ####
+
 如果新增数据成功，返回`true`,如果插入失败，返回`false`。
 
 ```
@@ -184,3 +186,21 @@ $insertResult = $dbInstance->table('file')
         'status'    =>  3,
     ]);
 ```
+#### 批量插入 ####
+
+如果数据量大的话，可以使用批量插入的方法`$dbInstance->addAll()`，示例代码如下:
+
+```
+$dataList = [
+    [
+        'name' =>  'bob',
+        'age'   =>      15,
+    ],[
+        'name'  =>  'john'
+        'age'   =>  18,
+    ]
+];
+$result = $dataInstance->table('user')
+    ->addAll($dataList);
+```
+如果成功，返回`true`,如果失败，返回`false`。

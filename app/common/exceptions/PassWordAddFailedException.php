@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class PassWordAddFailedException extends ExceptionHandler {
     protected $code = 700001;
     protected $message = '密码新增失败!';

@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class WordBookListGetFailedException extends ExceptionHandler {
     protected $code = 500002;
     protected $message = '获取单词本列表无失败!';

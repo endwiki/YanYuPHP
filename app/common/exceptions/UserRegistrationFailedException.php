@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class UserRegistrationFailedException extends ExceptionHandler{
     protected $code = 200004;
     protected $message = '注册发生了意外,请联系系统管理方!';

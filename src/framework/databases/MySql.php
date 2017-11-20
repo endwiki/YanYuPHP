@@ -6,11 +6,16 @@
  * Time: 9:30
  */
 namespace src\framework\databases;
+use src\framework\exceptions\DatabaseInsertDataHasEmptyException;
+use src\framework\exceptions\DatabaseJoinTypeNotMissException;
+use src\framework\exceptions\DatabaseTableNotMissException;
+
 class MySql {
     private $databaseInstance = null;               // 数据库实例
     private $fields = null;
     private $where = null;
     private $table = null;
+    private $join = null;
     private $order = null;
     private $group = null;
     private $having = null;
@@ -74,6 +79,7 @@ class MySql {
         $this->table = $name;
         return $this;
     }
+
     /**
      * 指定字段
      * @param array $fields  字段
@@ -83,35 +89,78 @@ class MySql {
         $this->fields = '`' . implode('`,`',$fields) . '`';
         return $this;
     }
-    public function join(array $join){
-    }
-    public function group(){
-    }
-    public function having(){
-    }
-    public function order(){
-    }
+
     /**
-     * 获取纪录
-     * @return mixed
+     * 指定 JOIN 子句
+     * @param String $table 关联表名
+     * @param String $condition 关联条件
+     * @param String $type 关联类型 default 'INNER' option [INNER|LEFT|RIGHT]
+     * @return $this
+     * @throws DatabaseJoinTypeNotMissException [100008]数据库关联语句类型没有找到异常
+     */
+    public function join(String $table,String $condition,String $type = 'INNER'){
+        $type = strtoupper($type);      // 转成大写
+        $typeList = ['INNER','LEFT','RIGHT'];
+        if(!in_array($type,$typeList)){
+            throw new DatabaseJoinTypeNotMissException();
+        }
+        $this->join .= ' ' . $type . ' JOIN `' . $table . '` ON ' . $condition ;
+        return $this;
+    }
+
+    /**
+     * 指定 GROUP BY 字句
+     * @param String $group GROUP 字句
+     * @return $this
+     */
+    public function group(String $group){
+        $this->group = ' GROUP BY ' . $group;
+        return $this;
+    }
+
+    /**
+     * 指定 HAVING 字句
+     * @param String $having HAVING 字句
+     * @return $this
+     */
+    public function having(String $having){
+        $this->group = $this->group . ' HAVING ' . $having;
+        return $this;
+    }
+
+    /**
+     * 设置排序字句
+     * @param String $order 排序字符串
+     * @return $this
+     */
+    public function order(String $order){
+        $this->order = $order;
+        return $this;
+    }
+
+    /**
+     * 查询记录
+     * @return array|mixed
+     * @throws DatabaseTableNotMissException [100007]数据库表没有找到异常
      */
     public function fetch(){
         if(is_null($this->table)){
-            echo 'Table not is empty!';
-            // 抛出异常
+            throw new DatabaseTableNotMissException();
         }
-        if(is_null($this->fields)){
-            $this->fields = '*';
-        }
-        if(is_null($this->where)){
-            $this->where = '1=1';
-        }
-        if(is_null($this->limit)){
-            $this->limit = 1;
-        }
+        // 赋予初值
+        $this->fields = $this->fields ?? '*';
+        $this->where = $this->where ?? '1=1';
+        $this->limit = $this->limit ?? 1;
+        $this->order = $this->order ?? '1=1';
+        $this->group = $this->group ?? '';
+        $this->join = $this->join ?? '';
+        // 拼接 SQL
         $sql = 'SELECT ' . $this->fields
             . ' FROM ' . $this->table
+            . $this->join
             . ' WHERE ' . $this->where
+            . $this->group
+            . ' ORDER BY ' . $this->order
             . ' LIMIT ' . $this->limit;
         $this->lastSql = $sql;              // 记录最后一次执行的 SQL
         $statementObject = $this->databaseInstance->prepare($sql);
@@ -133,6 +182,7 @@ class MySql {
         $this->fields = null;
         $this->where = null;
         $this->table = null;
+        $this->join = null;
         $this->order = null;
         $this->group = null;
         $this->having = null;
@@ -181,8 +231,40 @@ class MySql {
         $insertResult = $statementObject->execute($values);
         return $insertResult;
     }
-    public function addAll(){
+
+    /**
+     * 批量插入数据
+     * @param array $dataList 将要插入的行数据
+     * @return bool
+     * @throws DatabaseInsertDataHasEmptyException [100009]插入数据库的数据为空异常
+     */
+    public function addAll(array $dataList){
+        // 检查数据是否为空
+        if(!isset($dataList[0])){
+            throw new DatabaseInsertDataHasEmptyException();
+        }
+        $insertValue = '';          // 存储插入语句的 VALUES 部分
+        // 遍历数据
+        foreach($dataList as $dataIndex => $data){
+            $fields = [];      // 存储字段
+            foreach($data as $field => $value){
+                $fields[$field] = $field;           // 存储字段
+                $this->prepareValues[] = $value;    // 存储值
+            }
+            $insertValue .= ',(' . implode(','
+                    ,array_fill(0,count($fields),'?')
+                ) . ')';
+        }
+        // 拼接 SQL 并执行
+        $sql = 'INSERT INTO `' . $this->table
+            . '` (' . implode(',',$fields) . ') VALUES '
+            . substr($insertValue,1,strlen($insertValue)) . ';';
+        $this->lastSql = $sql;              // 保存 SQL
+        $statementObject = $this->databaseInstance->prepare($sql);
+        $result = $statementObject->execute($this->prepareValues);
+        return $result;
     }
+
     /**
      * 更新记录
      * @param array $data 将要更新的字段和字段值
@@ -205,12 +287,5 @@ class MySql {
         $updateResult = $statementObject->execute($values);
         return $updateResult;
     }
-    public function sum(){
-    }
-    public function count(){
-    }
-    public function delete(){
-    }
-    public function getField(){
-    }
+
 }

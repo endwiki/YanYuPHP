@@ -5,7 +5,7 @@
  * Date: 2017/10/22
  * Time: 21:35
  */
-namespace app\common\exceptions;
+namespace src\framework\exceptions;
 
 use src\framework\Request;
 use src\framework\Response;

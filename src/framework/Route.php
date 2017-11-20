@@ -20,8 +20,9 @@ class Route{
         if(strpos($requestUri,'?')){
             $requestUri = substr($requestUri,0,strpos($requestUri,'?'));
         }
-        $requestToken = explode('/',$requestUri);
         // 获取模块、控制器、方法
+        $requestToken = explode('/',$requestUri);
+        $requestToken = array_splice($requestToken,count($requestToken) - 3,3);
         list(self::$module,self::$controller,self::$action) = $requestToken;
         // 获取参数
         self::$args = array_splice($requestToken,3);

@@ -7,6 +7,8 @@
  */
 namespace app\common\exceptions;
 
+use src\framework\exceptions\ExceptionHandler;
+
 class TokenOutTimeException extends ExceptionHandler{
     protected $code = 200008;
     protected $message = 'Token 校验超时!';
