@@ -6,6 +6,8 @@
  * Time: 9:30
  */
 namespace src\framework\databases;
+use src\framework\exceptions\DatabaseTableNotMissException;
+
 class MySql {
     private $databaseInstance = null;               // 数据库实例
     private $fields = null;
@@ -89,29 +91,36 @@ class MySql {
     }
     public function having(){
     }
-    public function order(){
-    }
+
     /**
-     * 获取纪录
-     * @return mixed
+     * 设置排序字句
+     * @param String $order 排序字符串
+     * @return $this
+     */
+    public function order(String $order){
+        $this->order = $order;
+        return $this;
+    }
+
+    /**
+     * 查询记录
+     * @return array|mixed
+     * @throws DatabaseTableNotMissException [100007]数据库表没有找到异常
      */
     public function fetch(){
         if(is_null($this->table)){
-            echo 'Table not is empty!';
-            // 抛出异常
+            throw new DatabaseTableNotMissException();
         }
-        if(is_null($this->fields)){
-            $this->fields = '*';
-        }
-        if(is_null($this->where)){
-            $this->where = '1=1';
-        }
-        if(is_null($this->limit)){
-            $this->limit = 1;
-        }
+        // 赋予初值
+        $this->fields = $this->fields ?? '*';
+        $this->where = $this->where ?? '1=1';
+        $this->limit = $this->limit ?? 1;
+        $this->order = $this->order ?? '1=1';
+        // 拼接 SQL
         $sql = 'SELECT ' . $this->fields
             . ' FROM ' . $this->table
             . ' WHERE ' . $this->where
+            . ' ORDER BY ' . $this->order
             . ' LIMIT ' . $this->limit;
         $this->lastSql = $sql;              // 记录最后一次执行的 SQL
         $statementObject = $this->databaseInstance->prepare($sql);
