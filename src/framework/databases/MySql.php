@@ -87,9 +87,25 @@ class MySql {
     }
     public function join(array $join){
     }
-    public function group(){
+
+    /**
+     * 指定 GROUP BY 字句
+     * @param String $group GROUP 字句
+     * @return $this
+     */
+    public function group(String $group){
+        $this->group = ' GROUP BY ' . $group;
+        return $this;
     }
-    public function having(){
+
+    /**
+     * 指定 HAVING 字句
+     * @param String $having HAVING 字句
+     * @return $this
+     */
+    public function having(String $having){
+        $this->group = $this->group . ' HAVING ' . $having;
+        return $this;
     }
 
     /**
@@ -116,10 +132,12 @@ class MySql {
         $this->where = $this->where ?? '1=1';
         $this->limit = $this->limit ?? 1;
         $this->order = $this->order ?? '1=1';
+        $this->group = $this->group ?? '';
         // 拼接 SQL
         $sql = 'SELECT ' . $this->fields
             . ' FROM ' . $this->table
             . ' WHERE ' . $this->where
+            . $this->group
             . ' ORDER BY ' . $this->order
             . ' LIMIT ' . $this->limit;
         $this->lastSql = $sql;              // 记录最后一次执行的 SQL
