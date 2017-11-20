@@ -6,6 +6,7 @@
  * Time: 9:30
  */
 namespace src\framework\databases;
+use src\framework\exceptions\DatabaseJoinTypeNotMissException;
 use src\framework\exceptions\DatabaseTableNotMissException;
 
 class MySql {
@@ -13,6 +14,7 @@ class MySql {
     private $fields = null;
     private $where = null;
     private $table = null;
+    private $join = null;
     private $order = null;
     private $group = null;
     private $having = null;
@@ -85,7 +87,23 @@ class MySql {
         $this->fields = '`' . implode('`,`',$fields) . '`';
         return $this;
     }
-    public function join(array $join){
+
+    /**
+     * 指定 JOIN 子句
+     * @param String $table 关联表名
+     * @param String $condition 关联条件
+     * @param String $type 关联类型 default 'INNER' option [INNER|LEFT|RIGHT]
+     * @return $this
+     * @throws DatabaseJoinTypeNotMissException [100008]数据库关联语句类型没有找到异常
+     */
+    public function join(String $table,String $condition,String $type = 'INNER'){
+        $type = strtoupper($type);      // 转成大写
+        $typeList = ['INNER','LEFT','RIGHT'];
+        if(!in_array($type,$typeList)){
+            throw new DatabaseJoinTypeNotMissException();
+        }
+        $this->join .= ' ' . $type . ' JOIN `' . $table . '` ON ' . $condition ;
+        return $this;
     }
 
     /**
@@ -133,9 +151,11 @@ class MySql {
         $this->limit = $this->limit ?? 1;
         $this->order = $this->order ?? '1=1';
         $this->group = $this->group ?? '';
+        $this->join = $this->join ?? '';
         // 拼接 SQL
         $sql = 'SELECT ' . $this->fields
             . ' FROM ' . $this->table
+            . $this->join
             . ' WHERE ' . $this->where
             . $this->group
             . ' ORDER BY ' . $this->order
@@ -160,6 +180,7 @@ class MySql {
         $this->fields = null;
         $this->where = null;
         $this->table = null;
+        $this->join = null;
         $this->order = null;
         $this->group = null;
         $this->having = null;
@@ -232,12 +253,5 @@ class MySql {
         $updateResult = $statementObject->execute($values);
         return $updateResult;
     }
-    public function sum(){
-    }
-    public function count(){
-    }
-    public function delete(){
-    }
-    public function getField(){
-    }
+
 }
