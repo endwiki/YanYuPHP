@@ -43,6 +43,28 @@ class Request{
         return $response;
     }
 
+    /**
+     * PUT 请求方法
+     * @param String $url 请求地址
+     * @param array $params 传参 default null
+     * @return mixed
+     */
+    public static function sendPutRequest(String $url,array $params = null){
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_URL,$url);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch,CURLOPT_CUSTOMREQUEST,'put');
+        curl_setopt($ch,CURLOPT_HTTPHEADER,[
+            'X-HTTP-Method-Override:put',
+        ]);
+        if(!is_null($params)){
+            curl_setopt($ch,CURLOPT_POSTFIELDS,$params);
+        }
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return $response;
+    }
+
     public static function get(){
         return $_GET;
     }
