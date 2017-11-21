@@ -204,3 +204,25 @@ $result = $dataInstance->table('user')
     ->addAll($dataList);
 ```
 如果成功，返回`true`,如果失败，返回`false`。
+
+## 文件处理 ##
+
+### 创建文件夹 ###
+
+示例代码如下：
+
+```
+use src\framework\File;
+File::makeDir('test/test/log/2018',true);
+
+```
+返回值为布尔值。
+
+这个方法有四个参数，如下表:
+
+
+|  序号  | 参数名   |  参数类型 | 参数说明  |
+| --- | --- | --- | ---|
+|   1 | path   |  String  | 创建文件夹，包含路径 |
+|   2 |  recursive  |  Boolean  | 是否递归创建
+|  3  |  mode  |  String  | 文件夹权限，默认为 777 ，Windows 下无效 |
