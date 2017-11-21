@@ -10,7 +10,7 @@ namespace src\framework;
 class App {
 
     // 执行应用
-    public function start(){
+    public static function start(){
         $clazz = substr(APP_PATH,2) . '\\'
             . Route::getModule() . '\\' . Config::get('CONTROLLER_DIR') . '\\' . Route::getController();
         // 反射控制器

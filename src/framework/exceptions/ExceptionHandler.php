@@ -12,18 +12,10 @@ use src\framework\Response;
 
 class ExceptionHandler extends \Exception{
 
+    public $url = '';
+
     public function __construct($code = null,$message = null){
-        if(!is_null($code)){
-            $this->code = $code;
-        }
-        if(!is_null($message)){
-            $this->message = $message;
-        }
-        Response::ajaxReturn([
-            'message'       =>      $this->message,
-            'code'          =>      $this->code,
-            'url'           =>      Request::getUrl(),
-        ]);
+        $this->url = Request::getUrl();
     }
 
 }
