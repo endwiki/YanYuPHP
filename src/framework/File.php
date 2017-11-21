@@ -27,7 +27,7 @@ class File {
             throw new DirAlreadyExistException();
         }
         // 不递归，判断文件夹是否已经存在
-        if(!$recursive && !self::isDirExistByRecursive($path,true)){
+        if(!$recursive && !self::isDirExist($path,true)){
             throw new DirNotMissException();
         }
         $result = mkdir($path,$mode,$recursive);
@@ -41,21 +41,74 @@ class File {
      * @param bool $notFinal 不包含最后一层文件夹
      * @return bool
      */
-    public static function isDirExistByRecursive(String $path,bool $notFinal = true){
+    public static function isDirExist(String $path,bool $notFinal = true){
         $dirs = explode('/',$path);
         // 是否包含最后一层目录
         if($notFinal){
             array_pop($dirs);
         }
         // 逐层判断路径是否存在
-        while(count($dirs) != 0){
-            $path = implode('/',$dirs);
-            if(!is_dir($path)){
-                return false;
-            }
-            array_pop($dirs);
+        $path = implode('/',$dirs);
+        if(!is_dir($path)){
+            return false;
         }
         return true;
+    }
+
+    /**
+     * 写入文件
+     * @param array $dataList 写入数据
+     * @param String $path 文件路径
+     * @param String $mode 写入模式 default 'w+' option [r|r+|w|w+|a|a+|x|x+]
+     */
+    public static function textWrite(array $dataList,String $path,String $mode = 'w+'){
+        $fileHandler = fopen($path,$mode);
+        $content = '';
+        foreach($dataList as $item => $value){
+            $content .= $value . PHP_EOL;
+        }
+        fwrite($fileHandler,$content);
+        fclose($fileHandler);
+    }
+
+    /**
+     * 读取文本文件
+     * @param String $path 文件路径
+     * @param int $limit 行数
+     * @return array
+     */
+    public static function textRead(String $path,int $limit = -1){
+        $fileHandler = file($path);
+        $dataList = [];
+        foreach($fileHandler as $item => $value){
+            if($item === $limit){
+                break;
+            }
+            $dataList[] = trim($value);
+        }
+        return $dataList;
+    }
+
+    /**
+     * 在文本文件中查询字符串
+     * @param String $path 文件路径
+     * @param String $queryStr 查询字符串
+     * @return array
+     */
+    public static function textFind(String $path,String $queryStr){
+        $fileHandler = file($path);
+        $dataList = [];         // 用来匹配适应的行
+        $index = 0;
+        foreach($fileHandler as $item => $value){
+            $position = mb_strpos($value,$queryStr,0,'UTF-8');
+            if(false !== $position){
+                $dataList[$index]['no'] = $item;
+                $dataList[$index]['position'] = $position;
+                $dataList[$index]['value'] = trim($value);
+                $index++;
+            }
+        }
+        return $dataList;
     }
 
 }
