@@ -226,3 +226,24 @@ File::makeDir('test/test/log/2018',true);
 |   1 | path   |  String  | 创建文件夹，包含路径 |
 |   2 |  recursive  |  Boolean  | 是否递归创建
 |  3  |  mode  |  String  | 文件夹权限，默认为 777 ，Windows 下无效 |
+
+### 创建文件 ###
+
+如下示例:
+```
+File::textWirte('test/test/2017-11-20.log','w+');
+```
+
+### 读取文件 ###
+
+读取文本文件可以使用如下代码，比如读取前10行:
+
+```
+File::textRead('test/test/2017-11-20.log',10);
+```
+
+如果是读取大文件，可以使用迭代器,如下代码:
+
+```
+\src\framework\files\text\Reader::iterator('test/test/2017-11-20.log');
+```

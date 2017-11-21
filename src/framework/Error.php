@@ -48,6 +48,7 @@ class Error extends \Error{
      * @return mixed
      */
     public static function appException($e){
+        $info = [];
         if($e instanceof \Exception){
             $info = [
                 'code'  =>  $e->getCode(),
@@ -70,7 +71,8 @@ class Error extends \Error{
      * 程序结束句柄
      */
     public static function appShutdown(){
-        // TODO: 写入日志
+        // 记录请求日志
+
     }
 
 }

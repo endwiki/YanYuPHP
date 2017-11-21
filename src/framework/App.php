@@ -7,9 +7,31 @@
  */
 namespace src\framework;
 
+use src\framework\exceptions\RuntimeDirCreateFailedException;
+
 class App {
 
-    // 执行应用
+    /**
+     * 初始化应用
+     * @return void
+     */
+    public static function init(){
+        // 加载配置
+        Config::load(include APP_PATH . '/common/configs/App.php');
+        // 设置时区
+        date_default_timezone_set(Config::get('TIME_ZONE'));
+        // 初始化目录
+        self::initDir();
+        // 注册异常和错误处理
+        Error::register();
+        // 检查路由
+        Route::check();
+    }
+
+    /**
+     * 执行应用
+     * @return void
+     */
     public static function start(){
         $clazz = substr(APP_PATH,2) . '\\'
             . Route::getModule() . '\\' . Config::get('CONTROLLER_DIR') . '\\' . Route::getController();
@@ -21,12 +43,36 @@ class App {
             $reflectionMethod  = $controllerClazz->getMethod(Route::getAction());
             // 检查是否带有参数
             $ReflectionParameter = $reflectionMethod->getParameters();
+            $frameworkEndTime = (float)microtime(true);
+            Logger::add([
+                'Message:' . 'Framework execution is over.',
+                'Total Time:' . ($frameworkEndTime - SYSTEM_START_TIME)
+            ]);
             if(!$ReflectionParameter){
                 $reflectionMethod->invoke(new $clazz);
             }else{
                 $reflectionMethod->invokeArgs(new $clazz,Route::getArgs());
             }
         }
+        Logger::add([
+            'Message:' . 'Program execution is over.',
+            'Total Time:' . ((float)microtime(true) - $frameworkEndTime)
+        ]);
+    }
 
+    /**
+     * 初始化目录
+     * @return void
+     * @throws RuntimeDirCreateFailedException [100012]运行时目录创建失败
+     */
+    private static function initDir(){
+        $runtimeDir = Config::get('SYSTEM_RUNTIME_PATH');
+        File::makeDir($runtimeDir,true);      // 运行时目录
+        // 日志目录
+        $logDir = $runtimeDir . 'logs/' . Date('Y') . '/' . Date('m') . '/' . Date('d');
+        File::makeDir($logDir,true);
+        // 创建日志文件
+        $fileName = Date('YmdH') . '.log';
+        File::textWrite([],$logDir . '/' . $fileName);
     }
 }

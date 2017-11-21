@@ -18,7 +18,17 @@ class File {
      * @return bool
      */
     public static function makeDir(String $path,bool $recursive = false,String $mode = '777'){
-        return mkdir($path,$mode,$recursive);
+        // 递归，直接判断路径是否存在
+        if($recursive && is_dir($path)){
+            return false;
+        }
+        // 不递归，判断文件夹是否已经存在
+        if(!$recursive && !self::isDirExist($path,true)){
+            return false;
+        }
+        $result = mkdir($path,$mode,$recursive);
+
+        return $result;
     }
 
     /**
@@ -38,6 +48,7 @@ class File {
         if(!is_dir($path)){
             return false;
         }
+
         return true;
     }
 
