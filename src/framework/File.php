@@ -7,8 +7,6 @@
  */
 namespace src\framework;
 
-use src\framework\exceptions\DirAlreadyExistException;
-use src\framework\exceptions\DirNotMissException;
 
 class File {
 
@@ -18,21 +16,9 @@ class File {
      * @param bool $recursive 是否递归创建
      * @param String $mode 权限 default 777 在 Windows 环境下无效
      * @return bool
-     * @throws DirAlreadyExistException [100010]文件夹已经存在异常
-     * @throws DirNotMissException [100011]文件夹不存在异常
      */
     public static function makeDir(String $path,bool $recursive = false,String $mode = '777'){
-        // 递归，直接判断路径是否存在
-        if($recursive && is_dir($path)){
-            throw new DirAlreadyExistException();
-        }
-        // 不递归，判断文件夹是否已经存在
-        if(!$recursive && !self::isDirExist($path,true)){
-            throw new DirNotMissException();
-        }
-        $result = mkdir($path,$mode,$recursive);
-
-        return $result;
+        return mkdir($path,$mode,$recursive);
     }
 
     /**
@@ -84,7 +70,7 @@ class File {
             if($item === $limit){
                 break;
             }
-            $dataList[] = trim($value);
+            $dataList[] = rtrim($value);
         }
         return $dataList;
     }
@@ -104,7 +90,7 @@ class File {
             if(false !== $position){
                 $dataList[$index]['no'] = $item;
                 $dataList[$index]['position'] = $position;
-                $dataList[$index]['value'] = trim($value);
+                $dataList[$index]['value'] = rtrim($value);
                 $index++;
             }
         }
