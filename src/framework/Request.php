@@ -16,13 +16,25 @@ class Request{
      */
     public static function sendGetRequest($url){
         $ch = curl_init();
+        $isSSL = (substr($url,0,5) == 'https') ? true : false;
+        if($isSSL){
+            // 信任任何证书
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_PORT, 443);
+            // 部分网站一定要启用下面这个选项
+            curl_setopt($ch,CURLOPT_FOLLOWLOCATION,true);
+        }
+
         curl_setopt($ch,CURLOPT_URL,$url);
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
         curl_setopt($ch,CURLOPT_HEADER,0);
         $response = curl_exec($ch);
+
         curl_close($ch);
         return $response;
     }
+
     /**
      * POST 请求方法
      * @param String $url 请求路径
