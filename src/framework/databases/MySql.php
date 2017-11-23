@@ -226,6 +226,7 @@ class MySql {
             . '( ' . $fields
             . ') VALUE ('
             . implode(',',$placeholder) . ')';
+        $this->lastSql = $sql;
         // 预处理并执行 SQL
         $statementObject = $this->databaseInstance->prepare($sql);
         $insertResult = $statementObject->execute($values);
@@ -281,6 +282,7 @@ class MySql {
         // 去除末尾多余的逗号
         $updateFields = substr($updateFields , 0 , mb_strlen($updateFields) - 1);
         $sql = 'UPDATE ' . $this->table . ' SET ' . $updateFields . ' WHERE ' . $this->where;
+        $this->lastSql = $sql;
         $statementObject = $this->databaseInstance->prepare($sql);
         // 将更新的预处理字段值和 Where 条件中的预处理字段值组合
         $values = array_merge($values,$this->prepareValues);
