@@ -7,6 +7,8 @@
  */
 namespace src\framework;
 
+use src\framework\exceptions\ConfigParametersNotMatchException;
+
 class Config {
 
     private static $config;
@@ -16,15 +18,25 @@ class Config {
         self::$config = $config;
     }
 
-    // 获取配置
-    public static function get($key = null){
-        // 如果为空，则返回全部配置
-        if(is_null($key)){
-            return self::$config;
-        }else{
-            return (self::$config)[$key];
+    /**
+     * 读取配置
+     * @param String $key 配置索引
+     * @return mixed
+     * @throws ConfigParametersNotMatchException [100013]读取配置时参数个数不匹配
+     */
+    public static function get(String $key){
+        // 二层配置读取
+        if(strpos($key,'.')){
+            $level = explode('.',$key);
+            if(count($level) > 2){
+                throw new ConfigParametersNotMatchException();
+            }
+            list($oneLevel,$twoLevel) = explode('.',$key);
+
+            return self::$config[$oneLevel][$twoLevel];
         }
-        return null;
+        // 返回单层配置
+        return (self::$config)[$key];
     }
 
 }
