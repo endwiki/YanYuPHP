@@ -6,9 +6,11 @@
  * Time: 9:30
  */
 namespace src\framework\databases;
+use src\framework\exceptions\DatabaseExecuteFailedException;
 use src\framework\exceptions\DatabaseInsertDataHasEmptyException;
 use src\framework\exceptions\DatabaseJoinTypeNotMissException;
 use src\framework\exceptions\DatabaseTableNotMissException;
+use src\framework\exceptions\ExceptionHandler;
 
 class MySql {
     private $databaseInstance = null;               // 数据库实例
@@ -22,6 +24,7 @@ class MySql {
     private $lastSql = null;
     private $limit = null;
     private $prepareValues = [];          // PDO 预处理的字段
+    protected $errorInfo = [];
     /**
      * MySql constructor.
      * @param \PDO $database \PDO 实例
@@ -150,10 +153,12 @@ class MySql {
         // 赋予初值
         $this->fields = $this->fields ?? '*';
         $this->where = $this->where ?? '1=1';
-        $this->limit = $this->limit ?? 1;
         $this->order = $this->order ?? '1=1';
         $this->group = $this->group ?? '';
         $this->join = $this->join ?? '';
+        if($this->where == '1=1' && is_null($this->limit)){
+            $this->limit = 'LIMIT 1';
+        }
         // 拼接 SQL
         $sql = 'SELECT ' . $this->fields
             . ' FROM ' . $this->table
@@ -161,10 +166,13 @@ class MySql {
             . ' WHERE ' . $this->where
             . $this->group
             . ' ORDER BY ' . $this->order
-            . ' LIMIT ' . $this->limit;
+            . $this->limit;
         $this->lastSql = $sql;              // 记录最后一次执行的 SQL
         $statementObject = $this->databaseInstance->prepare($sql);
-        $statementObject->execute($this->prepareValues);
+        $queryResult = $statementObject->execute($this->prepareValues);
+        if(!$queryResult){
+            $this->errorInfo = $statementObject->errorInfo();
+        }
         // 之所以写再次'$this->clear()',是为了防止'$this->limit'判断之前被清空
         if($this->limit == 1){
             $this->clear();
@@ -195,7 +203,7 @@ class MySql {
      * @return $this
      */
     public function limit(int $number){
-        $this->limit = $number;
+        $this->limit = ' LIMIT ' . $number;
         return $this;
     }
     /**
@@ -230,6 +238,9 @@ class MySql {
         // 预处理并执行 SQL
         $statementObject = $this->databaseInstance->prepare($sql);
         $insertResult = $statementObject->execute($values);
+        if(!$insertResult){
+            $this->errorInfo = $statementObject->errorInfo();
+        }
         return $insertResult;
     }
 
@@ -263,6 +274,9 @@ class MySql {
         $this->lastSql = $sql;              // 保存 SQL
         $statementObject = $this->databaseInstance->prepare($sql);
         $result = $statementObject->execute($this->prepareValues);
+        if(!$result){
+            $this->errorInfo = $statementObject->errorInfo();
+        }
         return $result;
     }
 
@@ -287,7 +301,18 @@ class MySql {
         // 将更新的预处理字段值和 Where 条件中的预处理字段值组合
         $values = array_merge($values,$this->prepareValues);
         $updateResult = $statementObject->execute($values);
+        if(!$updateResult){
+            $this->errorInfo = $statementObject->errorInfo();
+        }
+
         return $updateResult;
     }
 
+    /**
+     * 对执行过程中的错误抛出异常
+     * @throws DatabaseExecuteFailedException [100012]MySQL 执行失败异常
+     */
+    protected function error(){
+        throw new DatabaseExecuteFailedException($this->errorInfo[1],$this->errorInfo[2]);
+    }
 }
