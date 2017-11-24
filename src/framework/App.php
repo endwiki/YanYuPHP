@@ -54,21 +54,15 @@ class App {
             $reflectionMethod  = $controllerClazz->getMethod(Route::getAction());
             // 检查是否带有参数
             $ReflectionParameter = $reflectionMethod->getParameters();
-            $frameworkEndTime = (float)microtime(true);
-            Logger::add([
-                'Message:' . 'Framework execution is over.',
-                'Total Time:' . ($frameworkEndTime - SYSTEM_START_TIME)
-            ]);
+            // 反射控制器
             if(!$ReflectionParameter){
-                $reflectionMethod->invoke(new $clazz);
+                $result = $reflectionMethod->invoke(new $clazz);
             }else{
-                $reflectionMethod->invokeArgs(new $clazz,Route::getArgs());
+                $result = $reflectionMethod->invokeArgs(new $clazz,Route::getArgs());
             }
+            // 输出响应
+            Response::ajaxReturn(['data' =>  $result]);
         }
-        Logger::add([
-            'Message:' . 'Program execution is over.',
-            'Total Time:' . ((float)microtime(true) - $frameworkEndTime)
-        ]);
     }
 
     /**
