@@ -23,7 +23,7 @@ class Route{
         'PATCH','COPY','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND',
         'VIEW'];
 
-    /**
+    /**2
      * 检查路由
      * @return void
      * @throws RouteRuleNotMissException [1000016]路由规则不匹配异常
@@ -74,14 +74,14 @@ class Route{
     /**
      * 设置路由规则
      * @param String $exp 路由表达式
-     * @param String $url 路由地址
+     * @param mixed $url 路由地址
      * @param String|array $method HTTP 方法
      * @param array $params 路由参数
      * @return void
      * @throws RouteMethodNotFoundException [100017] 路由方法不存在异常
      * @throws RouteMethodNotMatchException [100018] 路由方法不匹配异常
      */
-    public static function setRule(String $exp,String $url,$method,array $params = []){
+    public static function setRule(String $exp,$url,$method,array $params = []){
         // 检查方法是否存在
         if(is_array($method)){
             foreach($method as $item => $value){
@@ -106,6 +106,12 @@ class Route{
         // 允许多个方法通过
         if(is_array($method) && !in_array($requestMethod,$method)){
             throw new RouteMethodNotMatchException();
+        }
+        // 闭包支持
+        if(is_callable($url)){
+            $func = $url;   // 更改名称，增加可读性
+            call_user_func($func);
+            die();
         }
         self::$rule[$exp] = $url;
     }
