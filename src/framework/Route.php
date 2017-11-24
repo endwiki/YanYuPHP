@@ -7,6 +7,8 @@
  */
 namespace src\framework;
 
+use src\framework\exceptions\RouteMethodNotFoundException;
+use src\framework\exceptions\RouteMethodNotMatchException;
 use src\framework\exceptions\RouteRuleNotMissException;
 
 class Route{
@@ -16,6 +18,10 @@ class Route{
     private static $action;
     private static $args;
     private static $rule;                   // 路由规则
+    // 不支持 HEAD 方法
+    private static $methods = ['GET','POST','PUT','DELETE',
+        'PATCH','COPY','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND',
+        'VIEW'];
 
     /**
      * 检查路由
@@ -69,11 +75,38 @@ class Route{
      * 设置路由规则
      * @param String $exp 路由表达式
      * @param String $url 路由地址
-     * @param String $method HTTP 方法
+     * @param String|array $method HTTP 方法
      * @param array $params 路由参数
      * @return void
+     * @throws RouteMethodNotFoundException [100017] 路由方法不存在异常
+     * @throws RouteMethodNotMatchException [100018] 路由方法不匹配异常
      */
-    public static function setRule(String $exp,String $url,String $method = 'GET',array $params = []){
+    public static function setRule(String $exp,String $url,$method,array $params = []){
+        // 检查方法是否存在
+        if(is_array($method)){
+            foreach($method as $item => $value){
+                $method[$item] = strtoupper($value);        // 统一大小写
+                if(!in_array($method[$item],self::$methods)){
+                    throw new RouteMethodNotFoundException();
+                }
+            }
+        }else{
+            $method = strtoupper($method);              // 统一大小写
+            if(!in_array($method,self::$methods)){
+                throw new RouteMethodNotFoundException();
+            }
+        }
+
+        // 检查路由方法是否匹配
+        $requestMethod = Request::getMethod();
+        // 允许单个方法通过
+        if(is_string($method) && $method != $requestMethod){
+            throw new RouteMethodNotMatchException();
+        }
+        // 允许多个方法通过
+        if(is_array($method) && !in_array($requestMethod,$method)){
+            throw new RouteMethodNotMatchException();
+        }
         self::$rule[$exp] = $url;
     }
 

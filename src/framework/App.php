@@ -18,14 +18,14 @@ class App {
     public static function init(){
         // 加载配置
         Config::load(include APP_PATH . '/common/configs/App.php');
+        // 注册异常和错误处理
+        Error::register();
         // 加载路由配置
         require_once APP_PATH . '/common/configs/Route.php';
         // 设置时区
         date_default_timezone_set(Config::get('TIME_ZONE'));
         // 初始化目录
         self::initDir();
-        // 注册异常和错误处理
-        Error::register();
         // 检查路由
         Route::check();
         // 如果存在缓存则读取并响应
