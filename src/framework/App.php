@@ -26,6 +26,15 @@ class App {
         Error::register();
         // 检查路由
         Route::check();
+        // 如果存在缓存则读取并响应
+        $cache = Cache::getInstance();
+        $uniqueId = Route::getUniqueId();
+        if($cache->isExist($uniqueId) && Config::get('REQUEST.ON')) {
+            $response = $cache->read($uniqueId);
+            Response::setCacheFlag(true);
+            Response::ajaxReturn($response);
+        }
+        Response::setCacheFlag(false);
     }
 
     /**
@@ -74,5 +83,8 @@ class App {
         // 创建日志文件
         $fileName = Date('YmdH') . '.log';
         File::textWrite([],$logDir . '/' . $fileName);
+        // 创建缓存目录
+        $cacheDir = $runtimeDir . 'caches/';
+        File::makeDir($cacheDir,true);
     }
 }

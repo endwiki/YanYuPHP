@@ -25,12 +25,14 @@ class Request{
             // 部分网站一定要启用下面这个选项
             curl_setopt($ch,CURLOPT_FOLLOWLOCATION,true);
         }
-
+        curl_setopt($ch,CURLOPT_TIMEOUT,10);
         curl_setopt($ch,CURLOPT_URL,$url);
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
         curl_setopt($ch,CURLOPT_HEADER,0);
         $response = curl_exec($ch);
-
+        if($response === false){
+            echo curl_error($ch);
+        }
         curl_close($ch);
         return $response;
     }
