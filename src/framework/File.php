@@ -54,15 +54,20 @@ class File {
 
     /**
      * 写入文件
-     * @param array $dataList 写入数据
+     * @param String|array $dataList 写入数据
      * @param String $path 文件路径
      * @param String $mode 写入模式 default 'w+' option [r|r+|w|w+|a|a+|x|x+]
      */
-    public static function textWrite(array $dataList,String $path,String $mode = 'w+'){
+    public static function textWrite($dataList,String $path,String $mode = 'w+'){
         $fileHandler = fopen($path,$mode);
         $content = '';
-        foreach($dataList as $item => $value){
-            $content .= $value . PHP_EOL;
+        if(is_array($dataList)){
+            foreach($dataList as $item => $value){
+                $content .= $value . PHP_EOL;
+            }
+        }
+        if(is_string($dataList)){
+            $content = $dataList;
         }
         fwrite($fileHandler,$content);
         fclose($fileHandler);
@@ -106,6 +111,22 @@ class File {
             }
         }
         return $dataList;
+    }
+
+    /**
+     * 获取文件信息
+     * @param String $path 文件路径
+     * @return array
+     */
+    public static function getFileInfo(String $path){
+        $fileHandler = fopen($path,'r');
+        $fileInfo = fstat($fileHandler);
+        fclose($fileHandler);
+        return $fileInfo;
+    }
+
+    public static function delete(String $path){
+        return unlink($path);
     }
 
 }
