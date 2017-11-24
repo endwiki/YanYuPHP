@@ -15,6 +15,8 @@ class ExceptionHandler extends \Exception{
     public $url = '';
 
     public function __construct($code = null,$message = null){
+        $this->code = $code;
+        $this->message = $message;
         $this->url = Request::getUrl();
     }
 
