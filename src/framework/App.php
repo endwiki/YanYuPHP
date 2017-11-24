@@ -18,6 +18,8 @@ class App {
     public static function init(){
         // 加载配置
         Config::load(include APP_PATH . '/common/configs/App.php');
+        // 加载路由配置
+        require_once APP_PATH . '/common/configs/Route.php';
         // 设置时区
         date_default_timezone_set(Config::get('TIME_ZONE'));
         // 初始化目录
