@@ -26,7 +26,7 @@ class Database {
     /**
      * 获取数据库实例
      * @param String $dbName 数据库名称
-     * @return MySQL
+     * @return \src\framework\databases\DatabaseInterface
      * @throws DatabaseTypeNotFoundException [100024]数据库类型不支持异常
      */
     public static function getInstance(String $dbName){
