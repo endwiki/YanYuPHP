@@ -157,7 +157,7 @@ class MySql {
         $this->group = $this->group ?? '';
         $this->join = $this->join ?? '';
         if($this->where == '1=1' && is_null($this->limit)){
-            $this->limit = 'LIMIT 1';
+            $this->limit = ' LIMIT 1 ';
         }
         // 拼接 SQL
         $sql = 'SELECT ' . $this->fields
