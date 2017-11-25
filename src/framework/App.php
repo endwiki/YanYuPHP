@@ -61,8 +61,8 @@ class App {
                 throw new ClassNotFoundException();
             }
             require_once($classFile);
-            // 判断类是否存在
-            if(!class_exists($clazz)){
+            // 判断类或接口是否存在
+            if(!class_exists($clazz) && !interface_exists($clazz)){
                 throw new ClassNotFoundException();
             }
         });
