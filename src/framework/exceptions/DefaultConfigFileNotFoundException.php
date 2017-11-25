@@ -7,7 +7,7 @@
  */
 namespace src\framework\exceptions;
 
-class CommonConfigFileNotFoundException extends ExceptionHandler {
+class DefaultConfigFileNotFoundException extends ExceptionHandler {
     protected $code = 100022;
-    protected $message = '通用配置文件不存在!';
+    protected $message = '默认配置文件不存在!';
 }

@@ -21,10 +21,10 @@ class App {
     public static function init(){
         // 自动加载
         self::autoload();
+        // 加载配置
+        Config::loadAll();
         // 注册异常和错误处理
         Error::register();
-        // 加载配置
-        Config::load(include APP_PATH . '/common/configs/App.php');
         // 加载路由配置
         require_once APP_PATH . '/common/configs/Route.php';
         // 执行时间
