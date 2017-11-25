@@ -8,6 +8,8 @@
 namespace src\framework;
 
 
+use src\framework\exceptions\DirNotMissException;
+
 class File {
 
     /**
@@ -125,8 +127,39 @@ class File {
         return $fileInfo;
     }
 
+    /**
+     * 删除文件
+     * @param String $path 文件路径
+     * @return bool
+     */
     public static function delete(String $path){
         return unlink($path);
     }
 
+    /**
+     * 遍历目录文件
+     * @param String $path 目录路径
+     * @param array $filterExtensionName 过滤扩展名
+     * @throws DirNotMissException [100011]目录不存在异常
+     * @return array
+     */
+    public static function eachDir(String $path,array $filterExtensionName = []){
+        // 检查目录是否存在
+        if(!is_dir($path)){
+            throw new DirNotMissException();
+        }
+        // 遍历文件并过滤
+        $files = scandir($path);
+        $fileList = [];
+        foreach($files as $index => $file){
+            // 排除当前目录和上一级目录
+            if($file != '.' && $file != '..'){
+                $extensionName = pathinfo($file,PATHINFO_EXTENSION);
+                if(!in_array($extensionName,$filterExtensionName)){
+                    $fileList[] = $file;
+                }
+            }
+        }
+        return $fileList;
+    }
 }
