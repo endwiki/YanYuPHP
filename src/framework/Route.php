@@ -7,6 +7,7 @@
  */
 namespace src\framework;
 
+use src\framework\exceptions\RequestModuleNotFoundException;
 use src\framework\exceptions\RouteMethodNotFoundException;
 use src\framework\exceptions\RouteMethodNotMatchException;
 use src\framework\exceptions\RouteRuleNotMissException;
@@ -23,10 +24,11 @@ class Route{
         'PATCH','COPY','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND',
         'VIEW'];
 
-    /**2
+    /**
      * 检查路由
      * @return void
-     * @throws RouteRuleNotMissException [1000016]路由规则不匹配异常
+     * @throws RouteRuleNotMissException [100016]路由规则不匹配异常
+     * @throws RequestModuleNotFoundException [100021]请求的模块不存在
      */
     public static function check(){
         $requestUri = substr($_SERVER['REQUEST_URI'],1);
@@ -42,6 +44,11 @@ class Route{
             // 检查路由规则是否匹配
             if(count($requestToken) < 3){
                 throw new RouteRuleNotMissException();
+            }
+            // 检查模块是否存在
+            $modulePath = APP_PATH . '/' . $requestToken[0];
+            if(!is_dir($modulePath)){
+                throw new RequestModuleNotFoundException();
             }
             list(self::$module,self::$controller,self::$action) = $requestToken;
             // 获取参数

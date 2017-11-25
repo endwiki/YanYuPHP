@@ -7,6 +7,9 @@
  */
 namespace src\framework;
 
+use src\framework\exceptions\ClassNotFoundException;
+use src\framework\exceptions\RequestActionNotFoundException;
+use src\framework\exceptions\RequestControllerNotFoundException;
 use src\framework\exceptions\RuntimeDirCreateFailedException;
 
 class App {
@@ -16,10 +19,12 @@ class App {
      * @return void
      */
     public static function init(){
-        // 加载配置
-        Config::load(include APP_PATH . '/common/configs/App.php');
+        // 自动加载
+        self::autoload();
         // 注册异常和错误处理
         Error::register();
+        // 加载配置
+        Config::load(include APP_PATH . '/common/configs/App.php');
         // 加载路由配置
         require_once APP_PATH . '/common/configs/Route.php';
         // 执行时间
@@ -44,14 +49,41 @@ class App {
     }
 
     /**
+     * 类的自动加载
+     * @return void
+     * @throws ClassNotFoundException [100014]类不存在异常
+     */
+    public static function autoload(){
+        spl_autoload_register(function($clazz){
+            $classFile = str_replace('\\','/',$clazz . '.php');
+            // 判断文件是否存在
+            if(!is_file($classFile)){
+                throw new ClassNotFoundException();
+            }
+            require_once($classFile);
+            // 判断类是否存在
+            if(!class_exists($clazz)){
+                throw new ClassNotFoundException();
+            }
+        });
+    }
+
+    /**
      * 执行应用
      * @return void
+     * @throws RequestActionNotFoundException [100019]请求的操作不存在异常
+     * @throws RequestControllerNotFoundException [100020]请求的控制器不存在异常
      */
     public static function start(){
         $clazz = substr(APP_PATH,2) . '\\'
             . Route::getModule() . '\\' . Config::get('CONTROLLER_DIR') . '\\' . Route::getController();
         // 反射控制器
-        $controllerClazz = new \ReflectionClass($clazz);
+        try{
+            $controllerClazz = new \ReflectionClass($clazz);
+        }catch (ClassNotFoundException $e){
+            throw new RequestControllerNotFoundException();
+        }
+
         // 检查方法是否存在
         if($controllerClazz->hasMethod(Route::getAction())){
             // 反射方法
@@ -64,8 +96,12 @@ class App {
             }else{
                 $result = $reflectionMethod->invokeArgs(new $clazz,Route::getArgs());
             }
-            // 输出响应
-            Response::ajaxReturn(['data' =>  $result]);
+            // 如果存在返回结果，则输出响应
+            if(!is_null($result)){
+                Response::ajaxReturn(['data' =>  $result]);
+            }
+        }else{
+            throw new RequestActionNotFoundException();
         }
     }
 

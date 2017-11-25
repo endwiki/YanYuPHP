@@ -12,10 +12,7 @@ define('SYSTEM_NAME','HOME');
 define('LOG_PATH','./logs');
 define('APP_PATH','./app');
 
-// 自动加载
-spl_autoload_register(function($clazz){
-    require_once(str_replace('\\','/',$clazz . '.php'));
-});
+require_once './src/framework/App.php';
 
 // 初始化应用
 \src\framework\App::init();
