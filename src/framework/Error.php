@@ -29,17 +29,11 @@ class Error extends \Error{
      * @param String $file      错误文件
      * @param int $line         错误行号
      * @param array $content    错误栈
+     * @return void
+     * @throws Error
      */
     public static function appError(int $no,String $message,String $file,int $line,array $content = []){
-        $info = [
-            'no'    =>  $no,
-            'message'   =>  $message,
-            'file'  =>  $file,
-            'line'  =>  $line,
-            //'content'   =>  $content
-        ];
-        Response::ajaxReturn($info);
-        die();
+        throw new Error();
     }
 
     /**
