@@ -6,14 +6,17 @@
  * Time: 9:30
  */
 namespace src\framework\databases;
+
+use src\framework\exceptions\CreateMySQLInstanceFailedException;
 use src\framework\exceptions\DatabaseExecuteFailedException;
 use src\framework\exceptions\DatabaseInsertDataHasEmptyException;
 use src\framework\exceptions\DatabaseJoinTypeNotMissException;
 use src\framework\exceptions\DatabaseTableNotMissException;
-use src\framework\exceptions\ExceptionHandler;
 
-class MySql {
-    private $databaseInstance = null;               // 数据库实例
+
+
+class MySQL {
+
     private $fields = null;
     private $where = null;
     private $table = null;
@@ -25,13 +28,30 @@ class MySql {
     private $limit = null;
     private $prepareValues = [];          // PDO 预处理的字段
     protected $errorInfo = [];
+    protected $databaseInstance;
+
     /**
-     * MySql constructor.
-     * @param \PDO $database \PDO 实例
+     * 获取数据库实例
+     * @param array $config 数据库配置
+     * @return mixed
+     * @throws CreateMySQLInstanceFailedException [100023]创建MySQL数据库实例失败
      */
-    public function __construct(\PDO $database){
-        $this->databaseInstance = $database;
+    public function __construct(array $config){
+        // 创建实例
+        $dsn = 'mysql:dbname=' . $config['NAME'] . ';host='
+            . $config['HOST'] . ';port=' . $config['PORT']
+            . ';charset=' . $config['CHARSET'];
+        try{
+            $instance = new \PDO($dsn,$config['USER'],$config['PASSWORD']);
+        } catch(\PDOException $e){
+            throw new CreateMySQLInstanceFailedException();
+        }
+        $this->databaseInstance = $instance;
+        return $this;
     }
+
+
+
     /**
      * 指定条件
      * @param array $conditions 指定的条件
@@ -316,4 +336,5 @@ class MySql {
     protected function error(){
         throw new DatabaseExecuteFailedException($this->errorInfo[1],$this->errorInfo[2]);
     }
+
 }

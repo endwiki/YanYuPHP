@@ -6,46 +6,55 @@
  * Time: 19:09
  */
 namespace src\framework;
+
 use app\common\exceptions\CreateDatabaseInstanceFailedException;
-use src\framework\databases\MySql;
+use src\framework\databases\MySQL;
+use src\framework\exceptions\ClassNotFoundException;
+use src\framework\exceptions\ConfigNotFoundException;
+use src\framework\exceptions\DatabaseConfigNotFoundException;
+use src\framework\exceptions\DatabaseTypeNotFoundException;
+
 class Database {
-    private static $instance = [];
-    private static $mysql = null;
+
+    // 支持的数据库类型
+    private static $databaseType = ['MySQL','Redis','MongoDB'];
+    // 数据库实现类的命名空间
+    private static $namespace = 'src\\framework\\databases\\';
+    // 数据库实例
+    private static $instances = [];
+
     /**
      * 获取数据库实例
-     * @return MySql
-     * @throws CreateDatabaseInstanceFailedException [300001]创建数据库实例失败
+     * @param String $dbName 数据库名称
+     * @return MySQL
+     * @throws DatabaseTypeNotFoundException [100024]数据库类型不支持异常
      */
-    public static function getInstance(){
-        $dbConfig = self::getDefaultConfig();
-        // 创建实例唯一标识
-        $id = serialize($dbConfig['host'] . $dbConfig['db'] . $dbConfig['port']);
-        $instances = self::$instance;
-        if(!isset($instances[$id])){
-            if(is_null($dbConfig['user']) || is_null($dbConfig['password'])){
-                throw new CreateDatabaseInstanceFailedException();
-            }
-            // 创建实例
-            $dsn = 'mysql:dbname=' . $dbConfig['db'] . ';host=' . $dbConfig['host'] . ';port=' . $dbConfig['port']. ';charset=' . $dbConfig['charset'];
-            try{
-                $instances[$id] = new \PDO($dsn,$dbConfig['user'],$dbConfig['password']);
-            } catch(\PDOException $e){
-                throw new CreateDatabaseInstanceFailedException();
-            }
+    public static function getInstance(String $dbName){
+        $dbConfig = self::getConfig($dbName);
+        // 检查是否支持该数据库
+        if(!in_array($dbConfig['TYPE'],self::$databaseType)){
+            throw new DatabaseTypeNotFoundException();
         }
-        // 避免重复实例化 MySQL 类
-        $mysqlInstance = self::$mysql;
-        if(is_null($mysqlInstance)){
-            self::$mysql = self::$mysql = new MySql($instances[$id]);
+        // 如果实例不存在则实例化
+        if(!isset(self::$instances[$dbName])){
+            $class = self::$namespace . $dbName;
+            self::$instances[$dbName] = new $class($dbConfig);
         }
-        return self::$mysql;
+        return self::$instances[$dbName];
     }
+
     /**
      * 获取数据库默认配置
+     * @param String $dbName 数据库名称
      * @return mixed
+     * @throws DatabaseConfigNotFoundException [100026]没有找到对应的数据库配置异常
      */
-    private static function getDefaultConfig(){
-        $dbConfig = Config::get('database');
+    private static function getConfig(String $dbName){
+        try{
+            $dbConfig = Config::get(strtoupper($dbName),'DATABASE');
+        }catch(ConfigNotFoundException $e){
+            throw new DatabaseConfigNotFoundException();
+        }
         return $dbConfig;
     }
 }

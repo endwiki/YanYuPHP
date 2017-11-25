@@ -7,6 +7,7 @@
  */
 namespace src\framework;
 
+use src\framework\exceptions\ConfigNotFoundException;
 use src\framework\exceptions\DefaultConfigFileNotFoundException;
 use src\framework\exceptions\ConfigParametersNotMatchException;
 
@@ -43,6 +44,7 @@ class Config {
      * @param String $prefix 配置前缀
      * @return mixed
      * @throws ConfigParametersNotMatchException [100013]读取配置时参数个数不匹配
+     * @throws ConfigNotFoundException [1000025]没有找到配置项
      */
     public static function get(String $key,String $prefix = 'DEFAULT'){
         // 二层配置读取
@@ -52,8 +54,15 @@ class Config {
                 throw new ConfigParametersNotMatchException();
             }
             list($oneLevel,$twoLevel) = explode('.',$key);
-
+            // 没有找到配置项
+            if(!isset(self::$config[$prefix][$oneLevel][$twoLevel])){
+                throw new ConfigNotFoundException();
+            }
             return self::$config[$prefix][$oneLevel][$twoLevel];
+        }
+        // 没有找到配置项
+        if(!isset((self::$config)[$prefix][$key])){
+            throw new ConfigNotFoundException();
         }
         // 返回单层配置
         return (self::$config)[$prefix][$key];
