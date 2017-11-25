@@ -34,6 +34,12 @@ class Article extends Authorization {
         ]);
     }
 
+    /**
+     * 获取文章列表接口
+     * @method GET
+     * @api api/article/all
+     * @return mixed
+     */
     public function all(){
         $params = Request::get();
         (new ArticleAll())->eachFields($params);

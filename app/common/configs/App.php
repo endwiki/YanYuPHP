@@ -22,8 +22,16 @@ return [
         'TYPE'      =>  'FILE',                 // 缓存的类型
         'EXPIRATION'    =>  '10',               // 过期时间，单位为秒
     ],
+    'SYSTEM_EXECUTION_LIMIT'    =>  0,
+    'EXCEPTION_HANDLER'     =>      'app\\common\\ExceptionHandler',
+    'SYSTEM_KEY'            =>      '3D4C653A38B73C2DDE77BC6B502908AD',
     // 验证类的命名空间
     'VERIFY_CLASS_NAMESPACE'    =>  'src\\framework\\validations\\',
     // 数据库配置
     'database'              =>      include 'Database.php',
+    // 百度翻译 API 接口
+    'baidu_translate_api_ak'    =>  '20171119000097149',
+    'baidu_translate_api_sk'    =>  'bFsENQtrNvjpUqFTqygf',
+    'baidu_translate_api_url'   =>  'http://api.fanyi.baidu.com/api/trans/vip/translate',
+
 ];

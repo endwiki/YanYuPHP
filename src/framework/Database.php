@@ -6,15 +6,11 @@
  * Time: 19:09
  */
 namespace src\framework;
-
 use app\common\exceptions\CreateDatabaseInstanceFailedException;
 use src\framework\databases\MySql;
-
 class Database {
-
     private static $instance = [];
     private static $mysql = null;
-
     /**
      * 获取数据库实例
      * @return MySql
@@ -44,7 +40,6 @@ class Database {
         }
         return self::$mysql;
     }
-
     /**
      * 获取数据库默认配置
      * @return mixed
@@ -53,5 +48,4 @@ class Database {
         $dbConfig = Config::get('database');
         return $dbConfig;
     }
-
 }

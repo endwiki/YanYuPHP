@@ -22,6 +22,10 @@ class App {
         Error::register();
         // 加载路由配置
         require_once APP_PATH . '/common/configs/Route.php';
+        // 执行时间
+        if(!Config::get('SYSTEM_EXECUTION_LIMIT')){
+            set_time_limit(0);
+        }
         // 设置时区
         date_default_timezone_set(Config::get('TIME_ZONE'));
         // 初始化目录

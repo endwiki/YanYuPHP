@@ -83,7 +83,6 @@ class User {
      */
     public static function addUser(String $username,String $password){
         $databaseInstance = Database::getInstance();
-
         $passwordHash = password_hash($password,PASSWORD_DEFAULT,['cost'=>12]);
         $result = $databaseInstance->table('user')
             ->add([
