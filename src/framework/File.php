@@ -60,7 +60,7 @@ class File {
      * @param String $path 文件路径
      * @param String $mode 写入模式 default 'w+' option [r|r+|w|w+|a|a+|x|x+]
      */
-    public static function textWrite($dataList,String $path,String $mode = 'w+'){
+    public static function textWrite($dataList,String $path,String $mode = 'a+'){
         $fileHandler = fopen($path,$mode);
         $content = '';
         if(is_array($dataList)){

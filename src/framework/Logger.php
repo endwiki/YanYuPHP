@@ -7,29 +7,36 @@
  */
 namespace src\framework;
 
+use src\framework\exceptions\CalledMethodInvalidException;
+
 class Logger {
 
-    /**
-     * 添加日志
-     * @param array $data 日志内容
-     * @param String $type 日志类型 [RUN|WARRING|ERROR|DATABASE]
-     * @return void
-     */
-    public static function add(array $data,String $type = 'RUN'){
-        array_unshift($data,'Time:' . time());
-        array_unshift($data,'Type:' . $type);
-        array_push($data,'----------------------');
-        File::textWrite($data,self::getLogFile(),'a+');
-    }
+    public $instance;
+    public $namespace = '\\src\\framework\\logs\\';
 
     /**
-     * 获取日志文件路径
-     * @return String 日志文件路径
+     * 调用日志实现类的方法
+     * @param String $name 实现类方法名
+     * @param array $arguments 实现类参数数组
+     * @return mixed
+     * @throws CalledMethodInvalidException [100028]调用了不存在的方法
      */
-    private static function getLogFile(){
-        $logFile = Config::get('SYSTEM_RUNTIME_PATH')  . 'logs/'
-            . Date('Y') . '/' . Date('m') . '/' . Date('d') . '/'
-            . Date('YmdH') . '.log';
-        return $logFile;
+    public function __call(String $name, array $arguments){
+        // 获取日志类型配置
+        $logType = Config::get('LOG.TYPE','DEFAULT');
+        // 日志类型对应类名
+        $className = $this->namespace . ucfirst(strtolower($logType));
+        // 如果不存在实例，则实例化
+        if(!isset($this->instance)){
+            $this->instance = new $className();
+        }
+        // 执行方法
+        try{
+            $result = $this->instance->$name($arguments[0],$arguments[1]);
+        }catch (Error $e){
+            throw new CalledMethodInvalidException();
+        }
+        return $result;
     }
+
 }
