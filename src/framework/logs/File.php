@@ -15,15 +15,14 @@ class File implements LoggerInterface {
 
     /**
      * 添加日志
-     * @param array $data 日志内容
-     * @param String $type 日志类型 [RUN|WARRING|ERROR|DATABASE]
+     * @param String $data 日志内容
+     * @param String $level 日志类型 [RUN|WARRING|ERROR|DATABASE]
+     * @param String $namespace 命名空间 default 'Default'
      * @return void
      */
-    public function add(array $data,String $type = 'RUN'){
-        array_unshift($data,'Time:' . time());
-        array_unshift($data,'Type:' . $type);
-        array_push($data,'----------------------');
-        FileClass::textWrite($data,self::getLogFile(),'a+');
+    public function add(String $data,String $level = 'RECORD',String $namespace = 'Default'){
+        $content = '[' . Date('Y-m-d H:i:s',time()) . ']' . $namespace . '.' . $level . ':' . $data;
+        FileClass::textWrite($content,self::getLogFile(),'a+');
     }
 
     /**

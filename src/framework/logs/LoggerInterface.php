@@ -10,7 +10,7 @@ namespace src\framework\logs;
 interface LoggerInterface {
 
     // 写入日志
-    public function add(array $data,String $type);
+    public function add(String $data,String $type,String $namespace);
 
     // 读取日志
     public function get();
