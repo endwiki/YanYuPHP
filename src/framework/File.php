@@ -69,7 +69,7 @@ class File {
             }
         }
         if(is_string($dataList)){
-            $content = $dataList;
+            $content = $dataList . PHP_EOL;
         }
         fwrite($fileHandler,$content);
         fclose($fileHandler);
