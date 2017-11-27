@@ -123,4 +123,18 @@ class App {
         $cacheDir = $runtimeDir . 'caches/';
         File::makeDir($cacheDir,true);
     }
+
+    /**
+     * 未捕获的错误处理句柄
+     * @param \Error $error 错误类
+     * @return void
+     */
+    public static function notCapturedErrorHandler(\Error $error){
+        $errorInfo[] = '错误代码:' . $error->getCode();
+        $errorInfo[] = '错误消息:'  . $error->getMessage();
+        $errorInfo[] = '错误文件:'  . $error->getFile();
+        $errorInfo[] = '错误行号:'  . $error->getLine();
+        $errorInfo[] = '错误栈:' . PHP_EOL   . $error->getTraceAsString();
+        Error::errorOutput($errorInfo);
+    }
 }

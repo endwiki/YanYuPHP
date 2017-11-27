@@ -62,6 +62,23 @@ class Error extends \Error{
     }
 
     /**
+     * 处理错误
+     * @param array $error 错误信息
+     * @return void
+     */
+    public static function errorOutput(array $error){
+        $errorInfo = '';
+        foreach($error as $value){
+            $errorInfo .= $value . PHP_EOL;
+        }
+        if(DEBUG){
+            echo $errorInfo;
+        }
+        Logger::getInstance()->add($errorInfo,'Error');
+        die();
+    }
+
+    /**
      * 程序结束句柄
      */
     public static function appShutdown(){
