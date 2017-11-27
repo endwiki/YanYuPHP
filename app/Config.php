@@ -30,7 +30,9 @@ return [
     'VERIFY_CLASS_NAMESPACE'    =>  'src\\framework\\validations\\',
     // 百度翻译 API 接口
     'baidu_translate_api_ak'    =>  '20171119000097149',
-    'baidu_translate_api_sk'    =>  'bFsENQtrNvjpUqFTqygf',
+    'baidu_translate_api_sk'    =>  'bFsENQtrNvjpUqFTqygf-',
     'baidu_translate_api_url'   =>  'http://api.fanyi.baidu.com/api/trans/vip/translate',
-
+    'LOG'       =>  [
+        'TYPE'      =>  'FILE',
+    ]
 ];

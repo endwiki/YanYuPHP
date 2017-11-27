@@ -12,10 +12,10 @@ use src\framework\exceptions\DatabaseExecuteFailedException;
 use src\framework\exceptions\DatabaseInsertDataHasEmptyException;
 use src\framework\exceptions\DatabaseJoinTypeNotMissException;
 use src\framework\exceptions\DatabaseTableNotMissException;
+use src\framework\Logger;
 
 
-
-class MySQL {
+class MySQL implements DatabaseInterface {
 
     private $fields = null;
     private $where = null;
@@ -187,7 +187,7 @@ class MySQL {
             . $this->group
             . ' ORDER BY ' . $this->order
             . $this->limit;
-        $this->lastSql = $sql;              // 记录最后一次执行的 SQL
+        $this->setLastSql($sql);
         $statementObject = $this->databaseInstance->prepare($sql);
         $queryResult = $statementObject->execute($this->prepareValues);
         if(!$queryResult){
@@ -254,9 +254,8 @@ class MySQL {
             . ' (' . $fields
             . ') VALUE ('
             . implode(',',$placeholder) . ')';
-        $this->lastSql = $sql;
+        $this->setLastSql($sql);
         // 预处理并执行 SQL
-        $this->lastSql = $sql;
         $statementObject = $this->databaseInstance->prepare($sql);
         $insertResult = $statementObject->execute($values);
         if(!$insertResult){
@@ -292,7 +291,7 @@ class MySQL {
         $sql = 'INSERT INTO `' . $this->table
             . '` (' . implode(',',$fields) . ') VALUES '
             . substr($insertValue,1,strlen($insertValue)) . ';';
-        $this->lastSql = $sql;              // 保存 SQL
+        $this->setLastSql($sql);
         $statementObject = $this->databaseInstance->prepare($sql);
         $result = $statementObject->execute($this->prepareValues);
         if(!$result){
@@ -317,7 +316,7 @@ class MySQL {
         // 去除末尾多余的逗号
         $updateFields = substr($updateFields , 0 , mb_strlen($updateFields) - 1);
         $sql = 'UPDATE ' . $this->table . ' SET ' . $updateFields . ' WHERE ' . $this->where;
-        $this->lastSql = $sql;          // 记录 SQL
+        $this->setLastSql($sql);
         $statementObject = $this->databaseInstance->prepare($sql);
         // 将更新的预处理字段值和 Where 条件中的预处理字段值组合
         $values = array_merge($values,$this->prepareValues);
@@ -327,6 +326,14 @@ class MySQL {
         }
 
         return $updateResult;
+    }
+
+    protected function setLastSql(String $sql){
+        $this->lastSql = $sql;
+        // 在 DEBUG 模式下记录日志
+        if(DEBUG){
+            Logger::getInstance()->add($sql,'SQL');
+        }
     }
 
     /**

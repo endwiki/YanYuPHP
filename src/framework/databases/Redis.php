@@ -12,7 +12,7 @@ use src\framework\exceptions\CalledMethodInvalidException;
 use src\framework\exceptions\RedisAuthErrorException;
 use src\framework\exceptions\RedisConnectFailedException;
 
-class Redis {
+class Redis implements DatabaseInterface {
 
     protected $instance;        // 实例
 

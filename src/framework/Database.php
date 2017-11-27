@@ -7,12 +7,11 @@
  */
 namespace src\framework;
 
-use app\common\exceptions\CreateDatabaseInstanceFailedException;
-use src\framework\databases\MySQL;
-use src\framework\exceptions\ClassNotFoundException;
 use src\framework\exceptions\ConfigNotFoundException;
 use src\framework\exceptions\DatabaseConfigNotFoundException;
+use src\framework\exceptions\DatabaseConfigTypeUndefinedException;
 use src\framework\exceptions\DatabaseTypeNotFoundException;
+use src\framework\databases\DatabaseInterface;
 
 class Database {
 
@@ -26,12 +25,16 @@ class Database {
     /**
      * 获取数据库实例
      * @param String $dbName 数据库名称
-     * @return \src\framework\databases\DatabaseInterface
+     * @return DatabaseInterface
      * @throws DatabaseTypeNotFoundException [100024]数据库类型不支持异常
+     * @throws DatabaseConfigTypeUndefinedException [100030]数据库配置中数据库类型未定义异常
      */
     public static function getInstance(String $dbName){
         $dbConfig = self::getConfig($dbName);
         // 检查是否支持该数据库
+        if(!isset($dbConfig['TYPE'])){
+            throw new DatabaseConfigTypeUndefinedException();
+        }
         if(!in_array($dbConfig['TYPE'],self::$databaseType)){
             throw new DatabaseTypeNotFoundException();
         }
