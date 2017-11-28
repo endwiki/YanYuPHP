@@ -11,6 +11,7 @@ use src\framework\exceptions\ClassNotFoundException;
 use src\framework\exceptions\RequestActionNotFoundException;
 use src\framework\exceptions\RequestControllerNotFoundException;
 use src\framework\exceptions\RuntimeDirCreateFailedException;
+use src\framework\exceptions\TheIpDenyPassException;
 
 class App {
 
@@ -25,6 +26,8 @@ class App {
         Config::loadAll();
         // 注册异常和错误处理
         Error::register();
+        // 安全检查
+        self::checkSafe();
         // 加载路由配置
         require_once APP_PATH . '/common/configs/Route.php';
         // 执行时间
@@ -122,6 +125,20 @@ class App {
         // 创建缓存目录
         $cacheDir = $runtimeDir . 'caches/';
         File::makeDir($cacheDir,true);
+    }
+
+    /**
+     * 安全检查
+     * @return bool
+     * @throws TheIpDenyPassException [100032]该IP地址被拒绝访问异常
+     */
+    private static function checkSafe(){
+        // 检查 IP 地址
+        $ip = Request::getIp();
+        $denyIpList = Config::get('SAFE.DENY_IP_LIST');
+        if(in_array($ip,$denyIpList)){
+            throw new TheIpDenyPassException();
+        }
     }
 
     /**
