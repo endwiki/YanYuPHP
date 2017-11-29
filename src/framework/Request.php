@@ -40,11 +40,11 @@ class Request{
     /**
      * POST 请求方法
      * @param String $url 请求路径
-     * @param String $data 请求数据
+     * @param $data 请求数据
      * @param array $header 请求头
      * @return mixed
      */
-    public static function sendPostRequest(String $url,String $data,array $header = null){
+    public static function sendPostRequest(String $url,$data,array $header = null){
 
         $ch = curl_init();
 
@@ -57,10 +57,12 @@ class Request{
         curl_setopt($ch,CURLOPT_POST,1);
 
         curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
+
         // 设置请求头
         if(!is_null($header)){
             curl_setopt($ch,CURLOPT_HTTPHEADER,$header);
         }
+
         $response = curl_exec($ch);
         curl_close($ch);
         return $response;

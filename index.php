@@ -15,7 +15,7 @@ define('DEBUG',true);           // 调试模式
 
 require_once './src/framework/App.php';
 use \src\framework\App;
-
+set_time_limit(0);
 // 初始化应用
 App::init();
 // 执行应用

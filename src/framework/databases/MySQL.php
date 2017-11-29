@@ -194,7 +194,7 @@ class MySQL implements DatabaseInterface {
             $this->errorInfo = $statementObject->errorInfo();
         }
         // 之所以写再次'$this->clear()',是为了防止'$this->limit'判断之前被清空
-        if($this->limit == 1){
+        if(trim($this->limit) == 'LIMIT 1'){
             $this->clear();
             return $statementObject->fetch(\PDO::FETCH_ASSOC);
         }
@@ -272,7 +272,7 @@ class MySQL implements DatabaseInterface {
      */
     public function addAll(array $dataList){
         // 检查数据是否为空
-        if(!isset($dataList[0])){
+        if(count($dataList) == 0){
             throw new DatabaseInsertDataHasEmptyException();
         }
         $insertValue = '';          // 存储插入语句的 VALUES 部分
@@ -324,7 +324,7 @@ class MySQL implements DatabaseInterface {
         if(!$updateResult){
             $this->errorInfo = $statementObject->errorInfo();
         }
-
+        $this->clear();         // 清除数据，以免影响其他操作
         return $updateResult;
     }
 
