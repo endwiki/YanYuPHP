@@ -7,10 +7,8 @@
  */
 
 return [
-    'host'      =>      'mysql.end.wiki',
-    'port'      =>      '3306',
-    'db'        =>      'test',
-    'user'      =>      'endwiki',
-    'password'  =>      'Xbcd20198$',
-    'charset'   =>      'UTF8',
+    'MYSQL'    =>  [
+        'TYPE'      =>      'MySQL',
+        'CHARSET'   =>      'UTF8',
+    ]
 ];

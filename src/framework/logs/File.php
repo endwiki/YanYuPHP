@@ -30,9 +30,14 @@ class File implements LoggerInterface {
      * @return String 日志文件路径
      */
     private static function getLogFile(){
-        $logFile = Config::get('SYSTEM_RUNTIME_PATH')  . 'logs/'
-            . Date('Y') . '/' . Date('m') . '/' . Date('d') . '/'
-            . Date('YmdH') . '.log';
+        $path = Config::get('SYSTEM_RUNTIME_PATH')  . 'logs/'
+            . Date('Y') . '/' . Date('m') . '/' . Date('d') . '/';
+        $file = Date('YmdH') . '.log';
+        // 判断路径是否存在，不存在则创建
+        if(!FileClass::isDirExist($path)){
+            FileClass::makeDir($path,true);
+        }
+        $logFile = $path . $file;
         return $logFile;
     }
 

@@ -23,16 +23,29 @@ return [
         'TYPE'      =>  'FILE',                 // 缓存的类型
         'EXPIRATION'    =>  '10',               // 过期时间，单位为秒
     ],
+    // Cookie 配置
+    'COOKIE'            =>      [
+        'PREFIX'    =>      'sys_',
+        'HTTP_ONLY' =>      true,
+        'EXPIRE'    =>      30,
+        'SET_COOKIE'    =>  true,
+    ],
+    // Session 配置
+    'session'       =>          [
+        'prefix'        =>      'sys',
+        'save_path'      =>      'C:\xampp\tmp',
+        'cookie_lifetime'  =>  86400,
+    ],
+    // 安全配置
+    'SAFE'          =>          [
+        // 不允许访问的IP列表
+        'DENY_IP_LIST'  =>  [
+
+        ]
+    ],
     'SYSTEM_EXECUTION_LIMIT'    =>  0,
     'EXCEPTION_HANDLER'     =>      'app\\common\\ExceptionHandler',
     'SYSTEM_KEY'            =>      '3D4C653A38B73C2DDE77BC6B502908AD',
     // 验证类的命名空间
     'VERIFY_CLASS_NAMESPACE'    =>  'src\\framework\\validations\\',
-    // 百度翻译 API 接口
-    'baidu_translate_api_ak'    =>  '20171119000097149',
-    'baidu_translate_api_sk'    =>  'bFsENQtrNvjpUqFTqygf-',
-    'baidu_translate_api_url'   =>  'http://api.fanyi.baidu.com/api/trans/vip/translate',
-    'LOG'       =>  [
-        'TYPE'      =>  'FILE',
-    ]
 ];
