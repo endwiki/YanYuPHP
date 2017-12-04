@@ -162,4 +162,24 @@ class Reptile {
             // die();
         }
     }
+
+    /**
+     * 从 HTML 中获取指定标签内容
+     * @param String $url Html 路径
+     * @param String $tag Html 标签
+     * @param String $attr 标签属性
+     * @param String $value 标签属性值
+     * @return string
+     */
+    public function getTagValueFromHtml(String $url,String $tag,String $attr,String $value) : string{
+        $documentObject = new \DOMDocument('1.0','utf-8');
+        $documentObject->preserveWhiteSpace = false;
+        @$documentObject->loadHTMLFile($url);
+        $htmlTags = $documentObject->getElementsByTagName($tag);
+        foreach($htmlTags as $index => $htmlTag){
+            if($htmlTag->getAttribute($attr) === $value){
+                return $htmlTag->nodeValue;
+            }
+        }
+    }
 }
