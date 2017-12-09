@@ -20,8 +20,13 @@ return [
     ],
     // 缓存配置
     'CACHE'             =>      [
-        'TYPE'      =>  'FILE',                 // 缓存的类型
-        'EXPIRATION'    =>  '10',               // 过期时间，单位为秒
+        'TYPE'      =>  'REDIS',                 // 缓存的类型
+        'EXPIRATION'    =>  '30',               // 过期时间，单位为秒
+        'INSTANCE_NAME' =>  'REDIS',            // 实例名称
+    ],
+    // 日志配置
+    'LOG'               =>      [
+        'TYPE'      =>  'FILE',
     ],
     // Cookie 配置
     'COOKIE'            =>      [
@@ -35,6 +40,11 @@ return [
         'prefix'        =>      'sys',
         'save_path'      =>      'C:\xampp\tmp',
         'cookie_lifetime'  =>  86400,
+    ],
+    // 验证码配置
+    'CAPTCHA'       =>          [
+        'IMAGE_SIZE'    =>  '160,64',
+        'FONT_TTF_PATH' =>  './static/font/font.ttf',
     ],
     // 安全配置
     'SAFE'          =>          [
