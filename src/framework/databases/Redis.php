@@ -9,8 +9,10 @@ namespace src\framework\databases;
 
 use src\framework\Error;
 use src\framework\exceptions\CalledMethodInvalidException;
+use src\framework\exceptions\ClassNotFoundException;
 use src\framework\exceptions\RedisAuthErrorException;
 use src\framework\exceptions\RedisConnectFailedException;
+use src\framework\exceptions\RedisExtensionNotFoundException;
 
 class Redis implements DatabaseInterface {
 
@@ -21,9 +23,14 @@ class Redis implements DatabaseInterface {
      * @param array $config 数据库配置
      * @throws RedisAuthErrorException [100027]Redis 认证失败:密码错误异常
      * @throws RedisConnectFailedException [100026]Redis 连接失败异常
+     * @throws RedisExtensionNotFoundException [100037]Redis 扩展没有安装异常
      */
     public function __construct(array $config){
-        $redis = new \Redis();
+        try{
+            $redis = new \Redis();
+        }catch (ClassNotFoundException $e){
+            throw new RedisExtensionNotFoundException();
+        }
         // 连接服务器
         try{
             $redis->pconnect($config['HOST'],$config['PORT'],$config['CONNECT_TIMEOUT']);
@@ -39,6 +46,7 @@ class Redis implements DatabaseInterface {
         $this->instance = $redis;       // 保存实例
         return $this;
     }
+
 
     /**
      * 调用 Redis 实例的方法(避免了使用继承)
