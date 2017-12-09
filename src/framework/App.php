@@ -37,18 +37,18 @@ class App {
         // 设置时区
         date_default_timezone_set(Config::get('TIME_ZONE'));
         // 初始化目录
-        self::initDir();
+        // self::initDir();
         // 检查路由
         Route::check();
         // 如果存在缓存则读取并响应
-        $cache = Cache::getInstance();
-        $uniqueId = Route::getUniqueId();
-        if($cache->isExist($uniqueId) && Config::get('REQUEST.ON')) {
-            $response = $cache->read($uniqueId);
-            Response::setCacheFlag(true);
-            Response::ajaxReturn($response);
-        }
-        Response::setCacheFlag(false);
+//        $cache = Cache::getInstance();
+//        $uniqueId = Route::getUniqueId();
+//        if($cache->isExist($uniqueId) && Config::get('REQUEST.ON')) {
+//            $response = $cache->read($uniqueId);
+//            Response::setCacheFlag(true);
+//            Response::ajaxReturn($response);
+//        }
+//        Response::setCacheFlag(false);
     }
 
     /**
@@ -61,12 +61,12 @@ class App {
             $classFile = str_replace('\\','/',$clazz . '.php');
             // 判断文件是否存在
             if(!is_file($classFile)){
-                throw new ClassNotFoundException();
+                throw new ClassNotFoundException(100014,'[' . $clazz . '] 没有找到!');
             }
             require_once($classFile);
             // 判断类或接口是否存在
             if(!class_exists($clazz) && !interface_exists($clazz)){
-                throw new ClassNotFoundException();
+                throw new ClassNotFoundException(100014,'[' . $clazz . '] 没有找到!');
             }
         });
     }
@@ -93,19 +93,63 @@ class App {
             $reflectionMethod  = $controllerClazz->getMethod(Route::getAction());
             // 检查是否带有参数
             $ReflectionParameter = $reflectionMethod->getParameters();
+            // 执行前置操作
+            $params = self::before($reflectionMethod);
             // 反射控制器
             if(!$ReflectionParameter){
                 $result = $reflectionMethod->invoke(new $clazz);
             }else{
-                $result = $reflectionMethod->invokeArgs(new $clazz,Route::getArgs());
+                // 写入前置操作参数反射
+                $paramsFirst = $ReflectionParameter[0];
+                $args[$paramsFirst->name] = $params;
+                $result = $reflectionMethod->invokeArgs(new $clazz,$args);
             }
-            // 如果存在返回结果，则输出响应
-            if(!is_null($result)){
-                Response::ajaxReturn(['data' =>  $result]);
+            // 输出响应
+            if($result){
+                static::response($result);
             }
         }else{
             throw new RequestActionNotFoundException();
         }
+    }
+
+    // 前置操作
+    public static function before(\ReflectionMethod $reflectionMethod){
+        // 获取方法注释
+        $docComment = $reflectionMethod->getDocComment();
+        // 判断是否有前置操作的注释
+        if(strpos($docComment,'@before')){
+            $tokens = explode(' ',$docComment);
+            // 遍历查找前置操作的方法名
+            foreach($tokens as $item => $token){
+                if($token == '@before'){
+                    $methodName = $tokens[$item + 1];
+                    break;
+                }
+            }
+            // 反射方法并返回执行结果
+            list($clazz,$method) = explode('::',$methodName);
+            try{
+                $reflectionClazz = new \ReflectionClass($clazz);
+            }catch (ClassNotFoundException $e){
+                throw new RequestControllerNotFoundException();
+            }
+            $reflectionMethod = $reflectionClazz->getMethod(trim($method));
+            return $reflectionMethod->invoke(new $clazz);
+        }
+    }
+
+    /**
+     * 返回响应
+     * @param mixed $result 返回结果数据
+     * @return mixed
+     */
+    public static function response($result){
+        Response::ajaxReturn([
+            'message'   =>  'Success',
+            'code'      =>  0,
+            'data'      =>  $result,
+        ]);
     }
 
     /**
