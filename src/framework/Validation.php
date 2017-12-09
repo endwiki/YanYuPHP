@@ -7,8 +7,11 @@
  */
 namespace src\framework;
 
-use app\common\exceptions\VerificationFailedException;
-use app\common\exceptions\VerifyTypeNotFoundException;
+use src\framework\exceptions\VerificationFailedException;
+use src\framework\exceptions\VerifyRuleRequireUndefinedException;
+use src\framework\exceptions\VerifyTypeNotFoundException;
+use src\framework\exceptions\VerifyClassMessageDefinedException;
+use src\framework\exceptions\VerifyRuleTypeUndefinedException;
 
 class Validation{
 
@@ -20,6 +23,7 @@ class Validation{
      * @param array $fields 参与验证的字段
      * @return bool
      * @throws VerificationFailedException [100003] 验证失败异常
+     * @throws VerifyClassMessageDefinedException [100036]验证类消息没有定义
      */
     public function eachFields($fields){
         // 获取必填项
@@ -40,6 +44,10 @@ class Validation{
                     $result = $this->verifyRule($value,$rule,$fields);
                 }
                 if($result == false){
+                    // 没有定义错误消息，抛出异常
+                    if(!isset($rule['message']) && !isset($ruleValue['message'])){
+                        throw new VerifyClassMessageDefinedException();
+                    }
                     $message = isset($rule['message']) ? $rule['message'] : $ruleValue['message'];
                     throw new VerificationFailedException(100003,'字段:' . $field . '验证失败,原因是:'
                         . $message);
@@ -55,11 +63,12 @@ class Validation{
     protected function verifyRequire($fields){
         $reflectClass = new \ReflectionClass($this);
         $properties = $reflectClass->getProperties();
+        // 遍历规则
         foreach($properties as $property){
             $propertyName = $property->name;
             $property = $this->$propertyName;
             // 判断是否存在多重校验的情况
-            if(!isset($property['require'])){
+            if(isset($property[0])){
                 $isRequire = $property[0]['require'];
             }else{
                 $isRequire = $property['require'];
@@ -79,12 +88,16 @@ class Validation{
      * @param string|array $rule 验证的规则
      * @param array $fields 接口的字段,以备参数注入
      * @return bool|mixed
+     * @throws VerifyRuleTypeUndefinedException [100035]验证类类型没有定义异常
      * @throws VerifyTypeNotFoundException [100004]没有找到对应的验证方法
      * @throws \Exception
      */
     protected function verifyRule($value,$rule,$fields){
         // 检测验证类型是否存在
-        $namespace = Config::get('VERIFY_CLASS_NAMESPACE');
+        $namespace = Config::get('VERIFY_CLASS_NAMESPACE','DEFAULT');
+        if(!isset($rule['type'])){
+            throw new VerifyRuleTypeUndefinedException();
+        }
         $clazz = ucfirst(strtolower($rule['type'])) . 'Verify';
         if(!class_exists($namespace . $clazz)){
             throw new VerifyTypeNotFoundException(100004,'没有找到[' . $clazz . ']这个验证方法!');
