@@ -7,6 +7,7 @@
  */
 namespace src\framework\databases;
 
+use src\framework\Cache;
 use src\framework\exceptions\CreateMySQLInstanceFailedException;
 use src\framework\exceptions\DatabaseExecuteFailedException;
 use src\framework\exceptions\DatabaseInsertDataHasEmptyException;
@@ -37,6 +38,7 @@ class MySQL implements DatabaseInterface {
      * @throws CreateMySQLInstanceFailedException [100023]创建MySQL数据库实例失败
      */
     public function __construct(array $config){
+        $config['PORT'] = $config['PORT'] ?? 3306;      // 端口默认值
         // 创建实例
         $dsn = 'mysql:dbname=' . $config['NAME'] . ';host='
             . $config['HOST'] . ';port=' . $config['PORT']
@@ -163,10 +165,11 @@ class MySQL implements DatabaseInterface {
 
     /**
      * 查询记录
+     * @param bool $cache 是否缓存 default false
      * @return array|mixed
      * @throws DatabaseTableNotMissException [100007]数据库表没有找到异常
      */
-    public function fetch(){
+    public function fetch(bool $cache = false){
         if(is_null($this->table)){
             throw new DatabaseTableNotMissException();
         }
@@ -187,19 +190,31 @@ class MySQL implements DatabaseInterface {
             . $this->group
             . ' ORDER BY ' . $this->order
             . $this->limit;
-        $this->setLastSql($sql);
-        $statementObject = $this->databaseInstance->prepare($sql);
-        $queryResult = $statementObject->execute($this->prepareValues);
-        if(!$queryResult){
-            $this->errorInfo = $statementObject->errorInfo();
+        $this->setLastSql($sql);            // 设置上一次执行的SQL
+        // 如果存在缓存则读取缓存，否则查询
+        $cacheData = Cache::get(md5($sql));
+        if(Cache::get(md5($sql))){
+            return unserialize($cacheData);
+        }else{
+            // 查询数据
+            $statementObject = $this->databaseInstance->prepare($sql);
+            $queryResult = $statementObject->execute($this->prepareValues);
+            if(!$queryResult){
+                $this->errorInfo = $statementObject->errorInfo();
+            }
+            if(trim($this->limit) == 'LIMIT 1'){
+                $result = $statementObject->fetch(\PDO::FETCH_ASSOC);
+            }else{
+                $result = $statementObject->fetchAll(\PDO::FETCH_ASSOC);
+            }
+            // 缓存
+            if($cache){
+                Cache::set(md5($sql),serialize($result));
+            }
         }
-        // 之所以写再次'$this->clear()',是为了防止'$this->limit'判断之前被清空
-        if(trim($this->limit) == 'LIMIT 1'){
-            $this->clear();
-            return $statementObject->fetch(\PDO::FETCH_ASSOC);
-        }
-        $this->clear();
-        return $statementObject->fetchAll(\PDO::FETCH_ASSOC);
+
+        $this->clear();         // 清空成员参数，防止影响下一次查询
+        return $result;
     }
 
     /**
@@ -328,12 +343,24 @@ class MySQL implements DatabaseInterface {
         return $updateResult;
     }
 
+    /**
+     * 设置最后执行的 SQL
+     * @param String $sql
+     */
     protected function setLastSql(String $sql){
         $this->lastSql = $sql;
         // 在 DEBUG 模式下记录日志
         if(DEBUG){
             Logger::getInstance()->add($sql,'SQL');
         }
+    }
+
+    /**
+     * 获取最后插入的ID
+     * @return int
+     */
+    public function getLastInsertId(){
+        return $this->databaseInstance->lastInsertId();
     }
 
     /**
