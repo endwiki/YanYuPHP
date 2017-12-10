@@ -15,10 +15,11 @@ class SelectionSort{
      * @return array
      */
     public function sort(array $rawData) : array{
-        for($i = 0; $i < count($rawData);$i++){
+        $dataLength = count($rawData);
+        for($i = 0; $i < $dataLength;$i++){
             $minIndex = $i;
             // 选择最大的值
-            for($j = $i + 1; $j < count($rawData);$j++){
+            for($j = $i + 1; $j < $dataLength;$j++){
                 if($rawData[$j] < $rawData[$minIndex]){
                     $minIndex = $j;
                 }
