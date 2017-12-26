@@ -28,4 +28,16 @@ class Regular {
         }
         return $matches;
     }
+
+    /**
+     * 非空匹配
+     * @param String $subject 匹配的字符串
+     * @return array
+     */
+    public function notNull(String $subject){
+        $pattern = '#.+#';
+        $matches = [];
+        preg_match($pattern , $subject ,$matches);
+        return $matches;
+    }
 }
