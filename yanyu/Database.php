@@ -18,7 +18,7 @@ class Database {
     // 支持的数据库类型
     private static $databaseType = ['MySQL','Redis','MongoDB'];
     // 数据库实现类的命名空间
-    private static $namespace = 'src\\framework\\databases\\';
+    private static $namespace = 'yanyu\\databases\\';
     // 数据库实例
     private static $instances = [];
 
