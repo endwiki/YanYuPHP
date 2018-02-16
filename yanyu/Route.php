@@ -31,8 +31,15 @@ class Route{
      * @throws RequestModuleNotFoundException [100021]请求的模块不存在
      */
     public static function check(){
-        $requestUri = substr($_SERVER['REQUEST_URI'],1);
-        // 去除请求 URL 中的参数
+		// 路由兼容模式
+		$routeMode = Config::get('ROUTE_MODE');
+		if($routeMode === 1){
+			$requestUri = $_GET['s'];
+			list(self::$module,self::$controller,self::$action) = explode('/',$requestUri);
+		}else{
+			$requestUri = substr($_SERVER['REQUEST_URI'],1);	
+		}
+                // 去除请求 URL 中的参数
         if(strpos($requestUri,'?')){
             $requestUri = substr($requestUri,0,strpos($requestUri,'?'));
         }

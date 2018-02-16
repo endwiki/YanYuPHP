@@ -35,6 +35,7 @@ return [
         'EXPIRE'    =>      30,
         'SET_COOKIE'    =>  true,
     ],
+    'ROUTE_MODE'	=>	1,		// 路由兼容模式
     // Session 配置
     'session'       =>          [
         'prefix'        =>      'sys',
