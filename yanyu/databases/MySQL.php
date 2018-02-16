@@ -201,12 +201,16 @@ class MySQL implements DatabaseInterface {
             $queryResult = $statementObject->execute($this->prepareValues);
             if(!$queryResult){
                 $this->errorInfo = $statementObject->errorInfo();
+				return false;
             }
             if(trim($this->limit) == 'LIMIT 1'){
                 $result = $statementObject->fetch(\PDO::FETCH_ASSOC);
             }else{
                 $result = $statementObject->fetchAll(\PDO::FETCH_ASSOC);
             }
+			if(!$result){
+				return null;
+			}
             // 缓存
             if($cache){
                 Cache::set(md5($sql),serialize($result));
