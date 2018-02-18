@@ -18,8 +18,8 @@ if(PHP_VERSION < '7.0.0'){
     echo 'PHP version is too low,must be above 7.0.0!';
     die();
 }
-require_once './src/framework/App.php';
-use \src\framework\App;
+require_once './yanyu/App.php';
+use \yanyu\App;
 set_time_limit(0);
 // 初始化应用
 App::init();

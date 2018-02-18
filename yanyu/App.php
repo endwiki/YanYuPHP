@@ -14,7 +14,6 @@ use yanyu\exceptions\RuntimeDirCreateFailedException;
 use yanyu\exceptions\TheIpDenyPassException;
 
 class App {
-
     /**
      * 初始化应用
      * @return void

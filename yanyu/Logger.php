@@ -12,7 +12,7 @@ use yanyu\exceptions\CalledMethodInvalidException;
 class Logger {
 
     protected static $instance;
-    protected static $namespace = '\\src\\framework\\logs\\';
+    protected static $namespace = 'yanyu\\logs\\';
 
     public static function getInstance(){
         // 获取日志类型配置

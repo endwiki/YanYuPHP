@@ -29,6 +29,7 @@ class Cache {
         }
 
         $cacheType = Config::get('CACHE.TYPE');
+		var_dump($cacheType);
         $className = self::$namespace . ucfirst(strtolower($cacheType));
         if(!isset(self::$instance)){
             try{
