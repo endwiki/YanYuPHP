@@ -112,7 +112,13 @@ class MySQL implements DatabaseInterface {
      * @return $this
      */
     public function field(array $fields){
-        $this->fields = '`' . implode('`,`',$fields) . '`';
+        // 为字段添加 ` 号
+        foreach($fields as $item => $field){
+            if(strpos($field,'.')){
+                $fields[$item] = str_replace('.','.`',$field) . '`';
+            }
+        }
+        $this->fields = '' . implode(',',$fields) . '';
         return $this;
     }
 
