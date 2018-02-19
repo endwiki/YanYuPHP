@@ -90,8 +90,16 @@ class Request{
         return $response;
     }
 
-    public static function get(){
-        return $_GET;
+    /**
+     * 获取 GET 传参
+     * @param string|null $key 参数名
+     * @return mixed
+     */
+    public static function get($key = null){
+        if($key === null){
+            return $_GET;
+        }
+        return $_GET[$key];
     }
 
     /**
