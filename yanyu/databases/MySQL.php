@@ -63,6 +63,7 @@ class MySQL implements DatabaseInterface {
     public function where(array $conditions){
         foreach($conditions as $field => $value){
             // 判断是否指定操作符
+
             if(is_array($value)){
                 $operation = $this->operationConvert($value[0]);
                 $value = $value[1];
@@ -95,10 +96,10 @@ class MySQL implements DatabaseInterface {
             'like'  =>      'like',
             'in'    =>      'in',
         ];
-        if(!in_array($operation,array_keys($map))){
+        if(!in_array(strtolower($operation),array_keys($map))){
             return false;
         }
-        return $map[$operation];
+        return $map[strtolower($operation)];
     }
     /**
      * 指定表名
