@@ -118,7 +118,7 @@ class MySQL implements DatabaseInterface {
     public function field(array $fields){
         // 为字段添加 ` 号
         foreach($fields as $item => $field){
-            if(strpos($field,'.')){
+            if(strpos($field,'.') && !strpos($field,'as')){
                 $fields[$item] = str_replace('.','.`',$field) . '`';
             }
         }
