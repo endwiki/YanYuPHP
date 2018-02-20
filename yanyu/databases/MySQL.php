@@ -67,8 +67,12 @@ class MySQL implements DatabaseInterface {
                 $operation = $this->operationConvert($value[0]);
                 $value = $value[1];
             }
+            // 给字段添加 ` 符号
+            if(strpos($field,'.')){
+                $field = str_replace('.','.`',$field) . '`';
+            }
             $operation = isset($operation) ? (' ' . $operation . ' ') : ' = ';
-            $this->where .= ' AND `' . $field . '`' . $operation . '?';
+            $this->where .= ' AND ' . $field . '' . $operation . '?';
             // 纪录预处理的字段和值的映射
             $this->prepareValues[] =  $value;
         }
