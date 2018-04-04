@@ -33,7 +33,11 @@ class Error extends \Error{
      * @throws Error
      */
     public static function appError(int $no,String $message,String $file,int $line,array $content = []){
-        throw new Error();
+        echo 'No:' . $no . "<br />";
+        echo 'Message:' . $message . "<br />";
+        echo 'File:' . $file . "<br />";
+        echo 'Line:' . $line . "<br />";
+        echo "<br />";
     }
 
     /**
